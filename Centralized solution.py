@@ -72,6 +72,28 @@ def plot_me(x,y, alpha, ind, selection=True):
     plt.show()
 
 
+import numpy as np
+############ DGD algorithm #############
+
+# Compute the gradient for agent k
+def grad_a(alpha, k, K_a, K_mm, y_a, sigma, nu=1.0):
+    K_a_k=K_a[k]
+    y_a_k=y_a[k]
+    grad_k = K_a_k.T @ (K_a_k @ alpha - y_a_k) + sigma**2*K_mm@alpha/5 + nu*alpha/5
+    return grad_k
+
+# DGD algorithm
+def DGD(alpha_0, K_a, K_mm, y_a, W, sigma, nu=1.0, max_iter=1000, lr=0.01):
+    alpha = []
+    alpha.append(alpha_0)
+    a = len(K_a)
+    for _ in range(max_iter):
+        alpha_temp = alpha[-1]
+        grad = np.array([grad_a(alpha_temp[k], k, K_a, K_mm, y_a, sigma, nu) for k in range(a)])
+        alpha.append(W@alpha_temp - lr*grad)
+    return alpha
+
+
 """
 Main follows
 """
@@ -87,3 +109,46 @@ print('Result summary -----------------')
 print('Optimal centralised alpha = ', alpha)
 
 plot_me(x[:num_points],y[:num_points], alpha, ind, selection=True)
+
+
+# matplotlib setup
+import matplotlib
+# adjust the font size accordingly
+font = {'family' : 'sans',
+        'size'   : 12}
+
+matplotlib.rc('font', **font)
+
+############ DGD algorithm #############
+# Parameters for DGD (TO BE DISCUSSED and justified)
+n_iter = 200000
+step_size = 0.001
+a = 5 # number of agents
+x = x[:num_points]
+y = y[:num_points]
+n = len(x)
+m = int(np.sqrt(n))
+x2 = [x[i] for i in ind] # subset M of the data points
+K_nm = Cov2(x, x2) # kernel matrix between the data points and the subset M
+K_mm = Cov(x2) # kernel matrix between the subset M
+points_per_agent = n // a # number of data points per agent
+indices = np.random.permutation(n) # random permutation of the data points to be distributed among the agents
+# Split the data among the agents for the sum over Agents in the DGD algorithm
+K_a = [K_nm[indices[i*points_per_agent:(i+1)*points_per_agent], :] for i in range(a)]
+y_a = [y[indices[i*points_per_agent:(i+1)*points_per_agent]] for i in range(a)]
+W = np.ones([a,a])/a # consensus matrix (fully connected graph) TO BE MODIFIED for other topologies
+alpha_0 = np.zeros((a,m)) # Initialization of the local variables for each agent
+alpha_dgd = DGD(alpha_0, K_a, K_mm, y_a, W, sigma=0.5, nu=1.0, max_iter=n_iter, lr=step_size)
+print('DGD alpha = ', alpha_dgd[-1])
+# Plot Optimal gap
+gap = []
+opt_gap = [np.linalg.norm(alpha_i - alpha) for alpha_i in alpha_dgd]
+plt.loglog(np.arange(1,len(opt_gap)+1), opt_gap)
+plt.plot(gap, label='DGD')
+plt.xlabel('Number of iterations')
+plt.ylabel(r'Optimal gap $|\alpha_i - \alpha^*|$')
+plt.title(r'Convergence in terms of $|\alpha_i - \alpha^*|$ for DGD on the Kernel ridge regression example')
+plt.grid()
+# Save your figure in .pdf
+plt.tight_layout()
+plt.savefig('DGD.pdf')
