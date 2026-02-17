@@ -2,6 +2,7 @@ import pickle
 from Centralized_solution import solve, plot_me, Cov2, Cov
 import numpy as np
 from DGD import DGD
+from GT import GT
 from visualisation import make_gap_graph
 
 with open('data/first_database.pkl', 'rb') as f:
@@ -10,7 +11,7 @@ with open('data/first_database.pkl', 'rb') as f:
 
 ### PARAMETERS TO BE MODIFIED
 num_points = 100
-n_iter = 200000
+n_iter = 20000
 step_size = 0.001
 a = 5 # number of agents
 W = np.ones([a,a])/a # consensus matrix (fully connected graph) TO BE MODIFIED for other topologies
@@ -32,7 +33,7 @@ y_a = [y[indices[i*points_per_agent:(i+1)*points_per_agent]] for i in range(a)]
 ## DGD SOLVE 
 alpha_0 = np.zeros((a,m)) # Initialization of the local variables for each agent
 alpha_dgd = DGD(alpha_0, K_a, K_mm, y_a, W, sigma=0.5, nu=1.0, max_iter=n_iter, lr=step_size)
-
+alpha_gt = GT(alpha_0, K_a, K_mm, y_a, W, sigma=0.5, nu=1.0, max_iter=n_iter, lr=step_size)
 
 
 
@@ -41,7 +42,7 @@ alpha_dgd = DGD(alpha_0, K_a, K_mm, y_a, W, sigma=0.5, nu=1.0, max_iter=n_iter, 
 # PLOTS
 plot_me(x[:num_points],y[:num_points], alpha, ind, selection=True)
 
-alphaDict = {'DGD': alpha_dgd}
+alphaDict = {'DGD': alpha_dgd, 'GT': alpha_gt}
 
 make_gap_graph(alpha, alphaDict)
 
