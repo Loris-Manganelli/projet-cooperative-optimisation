@@ -1,0 +1,48 @@
+import pickle
+from Centralized_solution import solve, plot_me, Cov2, Cov
+import numpy as np
+from DGD import DGD
+from visualisation import make_gap_graph
+
+with open('data/first_database.pkl', 'rb') as f:
+   x,y = pickle.load(f)
+
+
+### PARAMETERS TO BE MODIFIED
+num_points = 100
+n_iter = 200000
+step_size = 0.001
+a = 5 # number of agents
+W = np.ones([a,a])/a # consensus matrix (fully connected graph) TO BE MODIFIED for other topologies
+
+## DATA PREPARATION
+x = x[:num_points]
+y = y[:num_points]
+alpha, ind = solve(x[:num_points],y[:num_points], selection=True)
+n = len(x)
+m = int(np.sqrt(n))
+x2 = [x[i] for i in ind] # subset M of the data points
+K_nm = Cov2(x, x2) # kernel matrix between the data points and the subset M
+K_mm = Cov(x2) # kernel matrix between the subset M
+points_per_agent = n // a # number of data points per agent
+indices = np.random.permutation(n) # random permutation of the data points to be distributed among the agents
+K_a = [K_nm[indices[i*points_per_agent:(i+1)*points_per_agent], :] for i in range(a)]
+y_a = [y[indices[i*points_per_agent:(i+1)*points_per_agent]] for i in range(a)]
+
+## DGD SOLVE 
+alpha_0 = np.zeros((a,m)) # Initialization of the local variables for each agent
+alpha_dgd = DGD(alpha_0, K_a, K_mm, y_a, W, sigma=0.5, nu=1.0, max_iter=n_iter, lr=step_size)
+
+
+
+
+
+
+# PLOTS
+plot_me(x[:num_points],y[:num_points], alpha, ind, selection=True)
+
+alphaDict = {'DGD': alpha_dgd}
+
+make_gap_graph(alpha, alphaDict)
+
+
