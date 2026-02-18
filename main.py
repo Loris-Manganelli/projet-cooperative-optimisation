@@ -3,7 +3,7 @@ from Centralized_solution import solve, plot_me, Cov2, Cov
 import numpy as np
 from DGD import DGD
 from visualisation import make_gap_graph
-
+import matplotlib.pyplot as plt
 with open('data/first_database.pkl', 'rb') as f:
    x,y = pickle.load(f)
 
@@ -32,10 +32,6 @@ y_a = [y[indices[i*points_per_agent:(i+1)*points_per_agent]] for i in range(a)]
 ## DGD SOLVE 
 alpha_0 = np.zeros((a,m)) # Initialization of the local variables for each agent
 alpha_dgd = DGD(alpha_0, K_a, K_mm, y_a, W, sigma=0.5, nu=1.0, max_iter=n_iter, lr=step_size)
-
-
-
-
 
 
 # PLOTS
