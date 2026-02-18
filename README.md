@@ -1,7 +1,7 @@
 # Part I (class 1 and 2)
 To be done : 
 - [x] Implement DGD
-- [ ] Implement Gradient tracking
+- [x] Implement Gradient tracking
 - [ ] Implement dual decomposition
 - [ ] Implement ADMM
 - [ ] Plot convergence graph
