@@ -20,4 +20,4 @@ def make_gap_graph(alpha, alphaDict):
     plt.grid()
     plt.legend()
     # plt.tight_layout()
-    plt.savefig('files/DGD.pdf')
+    plt.savefig('files/optimality_gap.pdf')
