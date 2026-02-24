@@ -4,7 +4,7 @@ import numpy as np
 from DGD import DGD
 from GT import GT
 from Dual_decomposition import dual_decomposition
-from visualisation import make_gap_graph
+from visualisation import make_gap_graph, make_reconstruction_graph
 import matplotlib.pyplot as plt
 with open('data/first_database.pkl', 'rb') as f:
    x,y = pickle.load(f)
@@ -57,9 +57,11 @@ alpha_dualdecomp, multipliers = dual_decomposition(multipliers_0, K_a, K_mm, y_a
 
 # PLOTS
 plot_me(x[:num_points],y[:num_points], alpha, ind, selection=True)
-   
+
+
 alphaDict = {'DGD': alpha_dgd, 'GT': alpha_gt, 'Dual Decomposition': alpha_dualdecomp}
 
+make_reconstruction_graph(x[:num_points],y[:num_points], alpha, alpha_dgd[-1], ind, selection=True, n_iter=n_iter, method_name="DGD", nt=250, agent_index=0)
 make_gap_graph(alpha, alphaDict)
 
 
