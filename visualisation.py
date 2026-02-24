@@ -33,7 +33,7 @@ def make_reconstruction_graph(x, y,alpha, alpha_method, ind, n_iter, agent_index
         x2 = np.linspace(-1, 1, 10)
 
     y_exact = Cov2(xo, x2) @ alpha
-    plt.plot(xo, y_exact, color='orange', linestyle='-', label="Reconstruction")
+    plt.plot(xo, y_exact, color='orange', linestyle='-', label="Optimal reconstruction")
     yo = Cov2(xo, x2) @ alpha_method[agent_index]
     plt.plot(xo, yo, color='red', linestyle='--', label=f"Reconstruction Agent {agent_index} after {n_iter} iterations")
     plt.xlabel(r'$x$ feature')
