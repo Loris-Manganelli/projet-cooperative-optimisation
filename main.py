@@ -1,4 +1,5 @@
 import pickle
+from ADMM import ADMM
 from Centralized_solution import solve, plot_me, Cov2, Cov
 import numpy as np
 from DGD import DGD
@@ -41,7 +42,9 @@ y_a = [y[indices[i*points_per_agent:(i+1)*points_per_agent]] for i in range(a)]
 
 
 alpha_0 = np.zeros((a,m)) # Initialization of the local variables for each agent
-multipliers_0 = np.zeros((m*int(np.sum(A)/2,))) # Initialization of the multipliers for dual decomposition
+multipliers_0 = np.zeros([int(np.sum(A)/2),m]) # Initialization of the multipliers for dual decomposition
+egalizers = np.zeros((int(np.sum(A)/2),m)) # Initialization of the egalizers for dual decomposition
+
 
 ## DGD SOLVE 
 alpha_dgd = DGD(alpha_0, K_a, K_mm, y_a, W, sigma=0.5, nu=1.0, max_iter=n_iter, lr=step_size)
@@ -49,6 +52,8 @@ alpha_dgd = DGD(alpha_0, K_a, K_mm, y_a, W, sigma=0.5, nu=1.0, max_iter=n_iter, 
 alpha_gt = GT(alpha_0, K_a, K_mm, y_a, W, sigma=0.5, nu=1.0, max_iter=n_iter, lr=step_size)
 ## DUAL DECOMPOSITION SOLVE
 alpha_dualdecomp, multipliers = dual_decomposition(multipliers_0, K_a, K_mm, y_a, np.ones([a, a]), sigma=0.5, nu=1.0, max_iter=n_iter, lr=10*step_size)   
+### ADMM SOLVE
+alpha_admm, multipliers_admm = ADMM(multipliers_0, egalizers, beta=10.0, K_a=K_a, K_mm=K_mm, y_a=y_a, A=np.ones([a,a])-np.eye(a), sigma=0.5, nu=1.0, max_iter=n_iter)
 
 
 # test de forat : 
@@ -60,7 +65,7 @@ alpha_dualdecomp, multipliers = dual_decomposition(multipliers_0, K_a, K_mm, y_a
 # plot_me(x[:num_points],y[:num_points], alpha, ind, selection=True)
 
 
-alphaDict = {'DGD': alpha_dgd, 'GT': alpha_gt, 'Dual Decomposition': alpha_dualdecomp}
+alphaDict = {'DGD': alpha_dgd, 'GT': alpha_gt, 'Dual Decomposition': alpha_dualdecomp, 'ADMM': alpha_admm}
 
 make_reconstruction_graph(x[:num_points],y[:num_points], alpha, alpha_dgd[-1], ind, selection=True, n_iter=n_iter, method_name="DGD", nt=250, agent_index=0)
 make_gap_graph(alpha, alphaDict)

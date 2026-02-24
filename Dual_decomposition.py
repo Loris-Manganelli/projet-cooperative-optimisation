@@ -1,7 +1,7 @@
 from utils import grad_a
 import numpy as np
 
-def Solve_Lagrane(K_a,K_mm,y_a,sigma,nu,k,multiplier,Am):  
+def Solve_Lagrange(K_a,K_mm,y_a,sigma,nu,k,multiplier,Am):  
     """
     Compute the dual function for agent k in multplier
     
@@ -16,20 +16,16 @@ def Solve_Lagrane(K_a,K_mm,y_a,sigma,nu,k,multiplier,Am):
     """
     N=len(K_a)
     #print("Shape of multiplier.T@Am[k]:", multiplier.T.shape)
+    return np.linalg.solve(K_a[k].T @ K_a[k] + (1/N)*sigma**2*K_mm + nu/(N)*np.eye(K_mm.shape[0]), K_a[k].T @ y_a[k]-multiplier.T@Am[:,k])
 
-    return np.linalg.solve(K_a[k].T @ K_a[k] + (1/N)*sigma**2*K_mm + nu/(N)*np.eye(K_mm.shape[0]), K_a[k].T @ y_a[k]-multiplier.T@Am[k])
 
-import numpy as np
-
-def build_constraint_matrices(adj, m):
+def build_constraint_matrices(adj):
     """
     adj : matrice d'adjacence numpy (N x N)
     m   : dimension de chaque variable xi
     
     Retour :
-        Am : liste de N matrices numpy
-            chaque matrice est de taille (E*m, m)
-            où E = nombre de liens !!! Attention au graphes complet !!! (E = N*(N-1)/2)
+        Am : matrice d'anti-incidence de taille (E, N)
     """
     
     N = adj.shape[0]
@@ -42,21 +38,15 @@ def build_constraint_matrices(adj, m):
     E = len(edges)
     
     # Initialisation : N matrices nulles de taille (E*m, m)
-    Am = [np.zeros((E*m, m)) for _ in range(N)]
-    
-    Id = np.eye(m)
-    
+    Am = np.zeros((E, N))    
     # Remplissage
     for e, (i, j) in enumerate(edges):
-        
-        row_start = e * m
-        row_end   = (e + 1) * m
-        
+                
         # bloc +I sur le plus petit indice
-        Am[i][row_start:row_end, :] = Id
+        Am[e][i] = 1
         
         # bloc -I sur l'autre
-        Am[j][row_start:row_end, :] = -Id
+        Am[e][j] = -1
     
     return Am
 
@@ -64,14 +54,16 @@ def dual_decomposition(multiplier_0,K_a, K_mm, y_a, A, sigma, nu=1.0, max_iter=1
     alpha = []
     multiplier = [multiplier_0]
     N=len(K_a)
-    Am=build_constraint_matrices(A, K_mm.shape[0])
+    Am=build_constraint_matrices(A)
 
 
     for _ in range(max_iter):
-        alpha_temp=[Solve_Lagrane(K_a,K_mm,y_a,sigma,nu,k,multiplier[-1],Am) for k in range(N)]
+        
+        alpha_temp=[Solve_Lagrange(K_a,K_mm,y_a,sigma,nu,k,multiplier[-1],Am) for k in range(N)]
         alpha.append(np.array(alpha_temp))
-        multiplier.append(multiplier[-1]+lr*(np.sum([Am[k]@alpha_temp[k] for k in range(N)],axis=0)))
+        multiplier.append(multiplier[-1]+lr*(Am@np.array(alpha_temp)))
     return alpha, multiplier
 
 # print(build_constraint_matrices(np.array([[0,1,1],[1,0,1],[1,1,0]]), 2)[1]) #test
-
+A=np.ones([3,3])-np.eye(3)
+#print(np.kron(A, np.eye(2)))
