@@ -50,20 +50,47 @@ def incidence(adj):
     
     return Am
 
+def incidence_oriented(adj):
+    """
+    adj : matrice d'adjacence numpy (N x N)
+
+    Retour :
+        Am : matrice d'incidence orientée de taille (E, N)
+        """
+    
+    N = adj.shape[0]
+    
+    # Extraire les liens (i < j)
+    edges = [(i, j) for i in range(N) 
+                      for j in range(i+1, N) 
+                      if adj[i, j] != 0]
+    
+    E = len(edges)
+    
+    # Initialisation : N matrices nulles de taille (E*m, m)
+    Am = np.zeros((E, N))    
+    # Remplissage
+    for e, (i, j) in enumerate(edges):
+                
+        # bloc +I sur le plus petit indice
+        Am[e][i] = 1    
+    return Am
+
 def ADMM(multiplier_0,egalizer_0,beta,K_a, K_mm, y_a, A, sigma, nu=1.0, max_iter=1000):
     alpha = []
     multiplier = [multiplier_0]
     egalizer = [egalizer_0]
     N=len(K_a)
     I=incidence(A)
+    Idir=incidence_oriented(A)
     # degree out:
     dout = np.sum(A, axis=1)
-    print([dout[k] for k in range(N)])
     
     for _ in range(max_iter):        
         alpha_temp=np.array([Solve_Augmented_Lagrangian(K_a,K_mm,y_a,sigma,nu,k,multiplier[-1]-beta*egalizer[-1],I,beta,dout[k]) for k in range(N)])
         alpha.append(alpha_temp)
         egalizer.append(I@alpha_temp/2)
-        multiplier.append(multiplier[-1]+beta*(I@alpha_temp-egalizer[-1]))
+        multiplier.append(multiplier[-1]+beta*(I@alpha_temp-2*egalizer[-1]))
     return alpha, multiplier
 
+A=np.ones([4,4])-np.eye(4)

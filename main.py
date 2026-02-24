@@ -43,8 +43,8 @@ y_a = [y[indices[i*points_per_agent:(i+1)*points_per_agent]] for i in range(a)]
 
 alpha_0 = np.zeros((a,m)) # Initialization of the local variables for each agent
 multipliers_0 = np.zeros([int(np.sum(A)/2),m]) # Initialization of the multipliers for dual decomposition
-egalizers = np.zeros((int(np.sum(A)/2),m)) # Initialization of the egalizers for dual decomposition
-
+egalizers_0 = np.zeros((int(np.sum(A)/2),m)) # Initialization of the egalizers for dual decomposition
+    
 
 ## DGD SOLVE 
 alpha_dgd = DGD(alpha_0, K_a, K_mm, y_a, W, sigma=0.5, nu=1.0, max_iter=n_iter, lr=step_size)
@@ -53,7 +53,7 @@ alpha_gt = GT(alpha_0, K_a, K_mm, y_a, W, sigma=0.5, nu=1.0, max_iter=n_iter, lr
 ## DUAL DECOMPOSITION SOLVE
 alpha_dualdecomp, multipliers = dual_decomposition(multipliers_0, K_a, K_mm, y_a, np.ones([a, a]), sigma=0.5, nu=1.0, max_iter=n_iter, lr=10*step_size)   
 ### ADMM SOLVE
-alpha_admm, multipliers_admm = ADMM(multipliers_0, egalizers, beta=10.0, K_a=K_a, K_mm=K_mm, y_a=y_a, A=np.ones([a,a])-np.eye(a), sigma=0.5, nu=1.0, max_iter=n_iter)
+alpha_admm, multipliers_admm = ADMM(multipliers_0, egalizers_0, beta=5, K_a=K_a, K_mm=K_mm, y_a=y_a, A=np.ones([a,a])-np.eye(a), sigma=0.5, nu=1.0, max_iter=n_iter)
 
 
 # test de forat : 
