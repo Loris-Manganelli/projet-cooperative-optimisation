@@ -3,7 +3,7 @@ import matplotlib
 import numpy as np
 from Centralized_solution import Cov2
 
-def make_gap_graph(alpha, alphaDict,pdf=True,precisionlimit=1e-12,title="files/GAP.pdf"):
+def make_gap_graph(alpha, alphaDict,pdf=True,precisionlimit=None,title="files/GAP.pdf"):
     plt.figure() # Create a new figure for the gap graph
     font = {'family' : 'sans',
         'size'   : 12}
