@@ -3,7 +3,7 @@ import matplotlib
 import numpy as np
 from Centralized_solution import Cov2
 
-def make_gap_graph(alpha, alphaDict):
+def make_gap_graph(alpha, alphaDict,pdf=True,precisionlimit=1e-12):
     plt.figure() # Create a new figure for the gap graph
     font = {'family' : 'sans',
         'size'   : 12}
@@ -13,15 +13,17 @@ def make_gap_graph(alpha, alphaDict):
     for (methodName, alphaList) in alphaDict.items():
         opt_gap = [np.linalg.norm(alpha_i - alpha) for alpha_i in alphaList]
         plt.loglog(np.arange(1,len(opt_gap)+1), opt_gap, label=methodName)
-
-
+    plt.ylim(bottom=precisionlimit)
     plt.xlabel('Number of iterations')
     plt.ylabel(r'Optimality gap $|\alpha_i - \alpha^*|$')
     plt.title('Convergence of optimality gap on Kernel ridge regression')
     plt.grid()
     plt.legend()
     # plt.tight_layout()
-    plt.savefig('files/GAP.pdf')
+    if pdf:
+        plt.savefig('files/GAP.pdf')
+    else:
+        plt.show()
 
 def make_reconstruction_graph(x, y,alpha, alpha_method, ind, n_iter, agent_index, method_name, nt, selection=True,):
     plt.figure() # Create a new figure for the reconstruction graph

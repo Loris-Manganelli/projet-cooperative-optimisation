@@ -44,7 +44,8 @@ y_a = [y[indices[i*points_per_agent:(i+1)*points_per_agent]] for i in range(a)]
 alpha_0 = np.zeros((a,m)) # Initialization of the local variables for each agent
 multipliers_0 = np.zeros([int(np.sum(A)/2),m]) # Initialization of the multipliers for dual decomposition
 egalizers_0 = np.zeros((int(np.sum(A)/2),m)) # Initialization of the egalizers for dual decomposition
-    
+
+
 
 ## DGD SOLVE 
 alpha_dgd = DGD(alpha_0, K_a, K_mm, y_a, W, sigma=0.5, nu=1.0, max_iter=n_iter, lr=step_size)
