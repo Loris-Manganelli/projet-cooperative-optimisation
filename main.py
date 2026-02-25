@@ -53,7 +53,7 @@ alpha_gt = GT(alpha_0, K_a, K_mm, y_a, W, sigma=0.5, nu=1.0, max_iter=n_iter, lr
 ## DUAL DECOMPOSITION SOLVE
 alpha_dualdecomp, multipliers = dual_decomposition(multipliers_0, K_a, K_mm, y_a, np.ones([a, a]), sigma=0.5, nu=1.0, max_iter=n_iter, lr=10*step_size)   
 ### ADMM SOLVE
-alpha_admm, multipliers_admm = ADMM(multipliers_0, egalizers_0, beta=5, K_a=K_a, K_mm=K_mm, y_a=y_a, A=np.ones([a,a])-np.eye(a), sigma=0.5, nu=1.0, max_iter=n_iter)
+alpha_admm, multipliers_admm = ADMM(multipliers_0, egalizers_0, beta=1, K_a=K_a, K_mm=K_mm, y_a=y_a, A=np.ones([a,a])-np.eye(a), sigma=0.5, nu=1.0, max_iter=n_iter)
 
 
 # test de forat : 
