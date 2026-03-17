@@ -1,0 +1,149 @@
+\documentclass[10pt,english]{article}
+\usepackage{babel,amsmath,amsfonts,amssymb,color,fancybox}
+\usepackage[latin1]{inputenc}
+\usepackage[a4paper, inner=2.5cm, outer=2.5cm, top=2.0cm, bottom=2cm, bindingoffset=0cm]{geometry}
+\usepackage{graphicx}
+\usepackage{stmaryrd}
+
+%\usepackage{times}                  % stile delle sections
+
+\newcommand{\reals}{\mathbf{R}}
+\parindent=0pt \parskip=3pt
+%
+\title{Review of Research Paper number 24}
+\date{version: \today}%Meeting held on: April the 2nd}
+\author{author 1, author 2, author 3}
+\begin{document}
+
+\maketitle
+%\small
+
+\section{Introduction}
+
+\subsection{Summary of the paper}
+
+% Describe in your own words [10 lines max]
+
+The article focuses on privacy preserving \textit{via} encryption (which is one of three ways
+among anonymisation, encryption, and differential privacy). It mainly says that existing approaches of encryption
+are cloud-based solution. Thus, the authors have the original idea to combine peer-to-peer (what they call cooperative)
+ADMM with encryption.
+
+\subsection{Problem formulation}
+
+% Introduce and report the problem that the paper presents in mathematical terms, {\bf by using the notation of the lecture notes.} [1 page max]
+
+We consider typical setting, introduced in the course, for ADMM application :
+
+\begin{equation}
+    \begin{aligned}
+    &\min_{x^i\in\mathbb{R}^{n}, y^{ij}\in\mathbb{R}^{|\mathcal{E}|}} \sum_{i=1}^{N} f_i(x^i)\\
+    \text{s.t } & x^i=y^{ij}, x^j=y^{ij}\  \forall i\sim j\\
+    & G_i x^i = E_i p_i\ \forall i   
+    \end{aligned}
+\end{equation}
+where 
+\begin{equation}
+f_i(x^i)=\dfrac{1}{2}(x^i)^T H_i x^i + p_i^T F_i^T x^i
+\end{equation}
+The authors also supposes that one has the particular following structure:
+$x^i=\begin{pmatrix}
+    \alpha_i\\
+    \gamma_i
+\end{pmatrix}$, and $p_i=\begin{pmatrix}
+    \beta_i\\
+    \delta_i
+\end{pmatrix}$. 
+
+For each agent $\alpha_i$ is the internal data and $\gamma_i$ represents information
+it has over its neighbors. $\delta_i$ is set by the operator and $\beta_i$ by the agent.
+
+The problem formulation consists in finding a peer-to-peer algorithm which fulfilled the following
+assumptions:
+\begin{enumerate}
+    \item Only agent $i$ should have access t $\alpha_i,\beta_i,H_i, F_i, G_i$ and $E_i$.
+    \item Only the operator should have access to $\delta_i$.
+    \item Neither devices, nor the operator should have access to $\gamma_i$.
+    \item Neither devices, nor operator should have access to $y^{ij}$.
+\end{enumerate}
+
+\subsection{Assumptions}
+
+%Introduce the main assumptions that the paper needs to derive the theoretical results. [1 page max]
+
+Appart the definition of the function for each agent, there is no particular assumptions. We are in the 
+good setting of convex, strongly convex (if $H_i$ is positive definite) and smooth function, so linear convergence
+holds for peer-to-peer ADMM.
+
+
+\section{Result: theory and practice}
+
+\subsection{Theory}
+
+% Describe the main theorems of the paper and the results therein in mathematical terms, {\bf by using the notation of the lecture notes.} Interpret the results [1 page max]
+
+Let derive the augmented Lagrangian for each device : 
+
+\begin{equation}
+    \mathcal{L}_i(x^i, y, \lambda) = f_i(x^i)+(\tilde\lambda^i)^T(G_ix^i-E_ip_i)+\dfrac{\beta}{2}\lVert G_ix^i-E_ip_i\rVert^2 + \sum_{j\sim i}(\lambda^{ij})^T (x^i-y^{ij})+\dfrac{\beta}{2}\lVert x^i-y^{ij}\rVert^2
+\end{equation}
+
+One can computes the gradient in order to derive ADMM iterations:
+
+\begin{align}
+    \nabla_{x^i} \mathcal{L}_i(x^i, y, \lambda) & = H_ix^i+F_ip_i+(\tilde\lambda^i)^T G_i^T+\beta G_i^T(G_ix^i-E_ip_i)+\sum_{j\sim i}[\lambda^{ij}+\beta(x^i-y^{ij})]\\
+    & = (H_i+\beta(\deg(x^i)I+G_i^TG_i))x^i+F_ip_i+G_i^T\tilde\lambda^i -\beta G_i^T E_ip_i +\sum_{j\sim i}[\lambda^{ij}-\beta y^{ij}]
+\end{align}
+
+So one can derive the ADMM iterations:
+
+\begin{itemize}
+    \item \textbf{Computation step}
+    \begin{equation}
+        x^i_{k+1}=(H_i+\beta(\deg(x^i_k)I+G_i^TG_i))^{-1}\left(\beta G_i^T E_ip_i -F_ip_i+ - G_i^T\tilde\lambda^i -\sum_{j\sim i}[\lambda^{ij}-\beta y^{ij}]\right)
+    \end{equation}
+    \item \textbf{Communication step} Each device communicates $x^i_{k+1}$ to its neighbors.
+    \item \textbf{Computation step}
+    \begin{equation}
+        y^{ij}_{k+1}=\dfrac{x^i_{k+1}+x^j_{k+1}}{2}
+    \end{equation}
+    \begin{equation}
+        \lambda^{ij}_{k+1}=\lambda^{ij}_{k}+\beta(x^i_{k+1}-y^{ij}_{k+1})
+    \end{equation}
+    \begin{equation}
+        \tilde\lambda_{k+1}^i=\tilde\lambda_{k}^i+\beta(G_ix^i{k+1}-E_ip_i)
+    \end{equation}
+\end{itemize}
+
+The main result of the algorithm is to introduce the following encrypted version of ADMM:
+
+\begin{itemize}
+    \item \textbf{Computation step}
+    \begin{equation}
+        \llbracket x^i_{k+1} \rrbracket_0=(H_i+\beta(\deg(x^i_k)I+G_i^TG_i))^{-1}\odot\left(\beta G_i^T E_i\odot \llbracket p_i\rrbracket_0 \ominus F_i\odot \llbracket p_i \rrbracket_0 \ominus G_i\odot \llbracket\tilde\lambda^i\rrbracket_0  \ominus \bigoplus_{j\sim i}[\llbracket\lambda^{ij}\rrbracket_0\ominus\llbracket\beta y^{ij}\rrbracket_0]\right)
+    \end{equation}
+    \item \textbf{Communication step} Each device communicates $\llbracket x^i_{k+1} \rrbracket_0$ to its neighbors.
+    \item \textbf{Computation step}
+    \begin{equation}
+        \llbracket y^{ij}_{k+1}\rrbracket_0=\dfrac{1}{2}\odot \llbracket x^i_{k+1}\rrbracket_0\oplus\llbracket x^j_{k+1}\rrbracket_0
+    \end{equation}
+    \begin{equation}
+        \llbracket\lambda^{ij}_{k+1}\rrbracket_0=\llbracket\lambda^{ij}_{k}\rrbracket_0+\beta\odot(\llbracket x^i_{k+1}\rrbracket_0\ominus\llbracket y^{ij}_{k+1}\rrbracket_0)
+    \end{equation}
+    \begin{equation}
+        \llbracket\tilde\lambda_{k+1}^i\rrbracket_0=\llbracket\tilde\lambda_{k}^i\rrbracket_0+\beta\odot(G_i\odot\llbracket x^i{k+1}\rrbracket_0\ominus \llbracket E_ip_i\rrbracket_0)
+    \end{equation}
+\end{itemize}
+
+\subsection{Practice}
+
+Code the main algorithm of the paper and apply it to the kernel setting of your python project. Compare the result with the most similar algorithm from the course. Comment on the results. [1 page max] [Send a link/file to the python code].
+
+\section{Conclusion}
+
+Draw some conclusion to put the paper in perspective with the course. [10 lines]
+
+\end{document}
+
+
+

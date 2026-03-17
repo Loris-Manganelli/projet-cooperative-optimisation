@@ -19,7 +19,9 @@ def Solve_Lagrange(K_a,K_mm,y_a,sigma,nu,k,multiplier,Am):
     return np.linalg.solve(K_a[k].T @ K_a[k] + (1/N)*sigma**2*K_mm + nu/(N)*np.eye(K_mm.shape[0]), K_a[k].T @ y_a[k]-multiplier.T@Am[:,k])
 
 
-def build_constraint_matrices(adj):
+
+
+def build_constraint_matrices(adj, m):
     """
     adj : matrice d'adjacence numpy (N x N)
     m   : dimension de chaque variable xi
