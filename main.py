@@ -2,6 +2,7 @@ import pickle
 from ADMM import ADMM
 from Centralized_solution import solve, plot_me, Cov2, Cov
 import numpy as np
+from DGD_DP import DGD_DP
 from DGD import DGD
 from GT import GT
 from Dual_decomposition import dual_decomposition
@@ -40,6 +41,14 @@ indices = np.random.permutation(n) # random permutation of the data points to be
 K_a = [K_nm[indices[i*points_per_agent:(i+1)*points_per_agent], :] for i in range(a)]
 y_a = [y[indices[i*points_per_agent:(i+1)*points_per_agent]] for i in range(a)]
 
+# Other parameters
+# Initialization and parameters of DGD
+alpha_0 = np.zeros((a,m)) # Initialization of the local variables for each agent
+n_iter = 50000
+step_size = 0.001
+sigma = 0.5
+nu = 1.0
+N = len(K_a) #number of agents
 
 alpha_0 = np.zeros((a,m)) # Initialization of the local variables for each agent
 multipliers_0 = np.zeros([int(np.sum(A)/2),m]) # Initialization of the multipliers for dual decomposition
@@ -47,14 +56,21 @@ egalizers_0 = np.zeros((int(np.sum(A)/2),m)) # Initialization of the egalizers f
 
 
 
-## DGD SOLVE 
+### DGD SOLVE 
 alpha_dgd = DGD(alpha_0, K_a, K_mm, y_a, W, sigma=0.5, nu=1.0, max_iter=n_iter, lr=step_size)
-## GT SOLVE
+### GT SOLVE
 alpha_gt = GT(alpha_0, K_a, K_mm, y_a, W, sigma=0.5, nu=1.0, max_iter=n_iter, lr=step_size)
-## DUAL DECOMPOSITION SOLVE
+### DUAL DECOMPOSITION SOLVE
 alpha_dualdecomp, multipliers = dual_decomposition(multipliers_0, K_a, K_mm, y_a, np.ones([a, a]), sigma=0.5, nu=1.0, max_iter=n_iter, lr=10*step_size)   
 ### ADMM SOLVE
 alpha_admm, multipliers_admm = ADMM(multipliers_0, egalizers_0, beta=1, K_a=K_a, K_mm=K_mm, y_a=y_a, A=np.ones([a,a])-np.eye(a), sigma=0.5, nu=1.0, max_iter=n_iter)
+### DGD-DP
+max_iter = 100000
+lr_list = [0.002/(1+0.001*k) for k in range(max_iter)]
+gamma_list = [1/(1+0.001*k**0.9) for k in range(max_iter)]
+eps=1
+nu_list = [(0.01/eps)*1/(1+0.001*k**0.1) for k in range(max_iter)]
+alpha_dgd_dp = DGD_DP(K_a, K_mm, y_a, W, sigma, gamma_list, nu_list, lr_list, nu=1.0, max_iter=max_iter)
 
 
 # test de forat : 
@@ -66,7 +82,7 @@ alpha_admm, multipliers_admm = ADMM(multipliers_0, egalizers_0, beta=1, K_a=K_a,
 # plot_me(x[:num_points],y[:num_points], alpha, ind, selection=True)
 
 
-alphaDict = {'DGD': alpha_dgd, 'GT': alpha_gt, 'Dual Decomposition': alpha_dualdecomp, 'ADMM': alpha_admm}
+alphaDict = {'DGD': alpha_dgd, 'GT': alpha_gt, 'Dual Decomposition': alpha_dualdecomp, 'ADMM': alpha_admm, rf"DGD-DP $\epsilon = {eps}$": alpha_dgd_dp}
 
 make_reconstruction_graph(x[:num_points],y[:num_points], alpha, alpha_dgd[-1], ind, selection=True, n_iter=n_iter, method_name="DGD", nt=250, agent_index=0)
 make_gap_graph(alpha, alphaDict)
