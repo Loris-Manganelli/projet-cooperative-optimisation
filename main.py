@@ -88,6 +88,6 @@ alpha_fedavg = { i:FedAVG(np.zeros((m,)), K_a, K_mm, y_a, sigma=0.5, nu=1.0, max
 alphaDict = {'DGD': alpha_dgd, 'GT': alpha_gt, 'Dual Decomposition': alpha_dualdecomp, 'ADMM': alpha_admm, rf"DGD-DP $\epsilon = {eps}$": alpha_dgd_dp}
 make_reconstruction_graph(x[:num_points],y[:num_points], alpha, alpha_dgd[-1], ind, selection=True, n_iter=n_iter, method_name="DGD", nt=250, agent_index=0)
 make_gap_graph(alpha, alphaDict)
-make_FedAVG_graph(alpha, alpha_fedavg)
+make_FedAVG_graph(alpha, alpha_fedavg, K_a, K_mm, y_a, sigma, nu=1.0, a=a)
 
 
