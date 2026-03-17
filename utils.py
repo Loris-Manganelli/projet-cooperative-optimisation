@@ -1,11 +1,16 @@
 import numpy as np
 
 # Compute the gradient for agent k
-def grad_a(alpha, k, K_a, K_mm, y_a, sigma, nu=1.0):
+def grad_a(alpha, k, K_a, K_mm, y_a, sigma, nu=1.0): # gradient de la fonction de coût de l'agent k en utilisant les données de l'agent k
     N=len(K_a)
     K_a_k=K_a[k]
     y_a_k=y_a[k]
     grad_k = K_a_k.T @ (K_a_k @ alpha - y_a_k) + sigma**2*K_mm@alpha/N + nu*alpha/N
+    return grad_k
+
+# For FedAVG
+def grad_a_batch(alpha, K_a_batch, K_mm, y_a_batch, sigma, N, nu=1.0): # gradient de la fonction de coût de l'agent k en utilisant les données de l'agent k
+    grad_k = K_a_batch.T @ (K_a_batch @ alpha - y_a_batch) + sigma**2*K_mm@alpha/N + nu*alpha/N
     return grad_k
 
 # Compute the value of the objective function for agent k

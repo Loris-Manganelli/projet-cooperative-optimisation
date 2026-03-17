@@ -9,7 +9,7 @@ def DGD(alpha_0, K_a, K_mm, y_a, W, sigma, nu=1.0, max_iter=1000, lr=0.01):
     a = len(K_a)
     for _ in range(max_iter):
         alpha_temp = alpha[-1]
-        grad = np.array([grad_a(alpha_temp[k], k, K_a, K_mm, y_a, sigma, nu) for k in range(a)])
+        grad = np.array([grad_a(alpha_temp[k], k, K_a, K_mm, y_a, sigma, nu) for k in range(a)]) # gradients des f_a (ici a est représenté par k)
         alpha.append(W@alpha_temp - lr*grad)
     return alpha
 

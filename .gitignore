@@ -1,3 +1,8 @@
 .venv/
 Mon-venv/
 __pycache__/
+Article/Lit-study-template.aux
+Article/Lit-study-template.fdb_latexmk
+Article/Lit-study-template.fls
+Article/Lit-study-template.log
+Article/Lit-study-template.synctex.gz
