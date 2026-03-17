@@ -1,7 +1,7 @@
 import numpy as np
 
 # Compute the gradient for agent k
-def grad_a(alpha, k, K_a, K_mm, y_a, sigma, nu=1.0):
+def grad_a(alpha, k, K_a, K_mm, y_a, sigma, nu=1.0): # gradient de la fonction de coût de l'agent k en utilisant les données de l'agent k
     N=len(K_a)
     K_a_k=K_a[k]
     y_a_k=y_a[k]
