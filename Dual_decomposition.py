@@ -56,7 +56,8 @@ def dual_decomposition(multiplier_0,K_a, K_mm, y_a, A, sigma, nu=1.0, max_iter=1
     alpha = []
     multiplier = [multiplier_0]
     N=len(K_a)
-    Am=build_constraint_matrices(A)
+    m=len(K_mm)
+    Am=build_constraint_matrices(A, m)
 
 
     for _ in range(max_iter):
