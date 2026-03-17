@@ -1,11 +1,10 @@
 import numpy as np
-from utils import grad_a
+from utils import grad_a_batch
 
 def FedAVG(alpha_0, K_a, K_mm, y_a, sigma, nu, max_iter, lr):
 
     E = 10
     a = len(K_a) # number of agents
-    m = len(K_mm) # dimension of the local variables
     num_points_per_agent = len(K_a[0]) # number of data points per agent
     # the data of each agent is divided in n_batches batches
     n_batches = 1
@@ -29,11 +28,11 @@ def FedAVG(alpha_0, K_a, K_mm, y_a, sigma, nu, max_iter, lr):
         alphas = [current_alpha for _ in range(a)] # create a copy of the current alpha for each agent
         for _ in range(E): # perform E iterations of mini-batch gradient descent for each agent
             for k in range(a):
-                batch = np.random.choice(BATCHES[k]) # select a random batch of data points for agent k
+                batch = BATCHES[k][np.random.randint(0, n_batches)] # select a random batch of data points for agent k
                 # select the corresponding kernel matrices and labels for the selected batch
-                K_a_k = K_a[k][batch, :]
-                y_a_k = y_a[k][batch]
-                grad = grad_a(alphas[k], k, K_a_k, K_mm, y_a_k, sigma, nu) # gradient of the objective function of agent k using the data of agent k
+                K_a_batch = np.array([K_a[k][i, :] for i in batch])
+                y_a_batch = np.array([y_a[k][i] for i in batch])
+                grad = grad_a_batch(alphas[k], K_a_batch, K_mm, y_a_batch, sigma, a, nu) # gradient of the objective function of agent k using the data of agent k
                 alphas[k] = alphas[k] - lr*grad # update of the local variable of agent k using the gradient and the learning rate
             
         ## SERVER UPDATE

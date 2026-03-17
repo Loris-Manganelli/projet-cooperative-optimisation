@@ -7,6 +7,7 @@ from DGD import DGD
 from GT import GT
 from Dual_decomposition import dual_decomposition
 from visualisation import make_gap_graph, make_reconstruction_graph
+from FedAVG import FedAVG
 import matplotlib.pyplot as plt
 with open('data/first_database.pkl', 'rb') as f:
    x,y = pickle.load(f)
@@ -56,23 +57,24 @@ egalizers_0 = np.zeros((int(np.sum(A)/2),m)) # Initialization of the egalizers f
 
 
 
-### DGD SOLVE 
-alpha_dgd = DGD(alpha_0, K_a, K_mm, y_a, W, sigma=0.5, nu=1.0, max_iter=n_iter, lr=step_size)
-### GT SOLVE
-alpha_gt = GT(alpha_0, K_a, K_mm, y_a, W, sigma=0.5, nu=1.0, max_iter=n_iter, lr=step_size)
-### DUAL DECOMPOSITION SOLVE
-alpha_dualdecomp, multipliers = dual_decomposition(multipliers_0, K_a, K_mm, y_a, np.ones([a, a]), sigma=0.5, nu=1.0, max_iter=n_iter, lr=10*step_size)   
-### ADMM SOLVE
-alpha_admm, multipliers_admm = ADMM(multipliers_0, egalizers_0, beta=1, K_a=K_a, K_mm=K_mm, y_a=y_a, A=np.ones([a,a])-np.eye(a), sigma=0.5, nu=1.0, max_iter=n_iter)
-### DGD-DP SOLVE
-max_iter = 100000
-lr_list = [0.002/(1+0.001*k) for k in range(max_iter)]
-gamma_list = [1/(1+0.001*k**0.9) for k in range(max_iter)]
-eps=1
-nu_list = [(0.01/eps)*1/(1+0.001*k**0.1) for k in range(max_iter)]
-alpha_dgd_dp = DGD_DP(K_a, K_mm, y_a, W, sigma, gamma_list, nu_list, lr_list, nu=1.0, max_iter=max_iter)
+# ### DGD SOLVE 
+# alpha_dgd = DGD(alpha_0, K_a, K_mm, y_a, W, sigma=0.5, nu=1.0, max_iter=n_iter, lr=step_size)
+# ### GT SOLVE
+# alpha_gt = GT(alpha_0, K_a, K_mm, y_a, W, sigma=0.5, nu=1.0, max_iter=n_iter, lr=step_size)
+# ### DUAL DECOMPOSITION SOLVE
+# alpha_dualdecomp, multipliers = dual_decomposition(multipliers_0, K_a, K_mm, y_a, np.ones([a, a]), sigma=0.5, nu=1.0, max_iter=n_iter, lr=10*step_size)   
+# ### ADMM SOLVE
+# alpha_admm, multipliers_admm = ADMM(multipliers_0, egalizers_0, beta=1, K_a=K_a, K_mm=K_mm, y_a=y_a, A=np.ones([a,a])-np.eye(a), sigma=0.5, nu=1.0, max_iter=n_iter)
+# ### DGD-DP SOLVE
+# max_iter = 100000
+# lr_list = [0.002/(1+0.001*k) for k in range(max_iter)]
+# gamma_list = [1/(1+0.001*k**0.9) for k in range(max_iter)]
+# eps=1
+# nu_list = [(0.01/eps)*1/(1+0.001*k**0.1) for k in range(max_iter)]
+# alpha_dgd_dp = DGD_DP(K_a, K_mm, y_a, W, sigma, gamma_list, nu_list, lr_list, nu=1.0, max_iter=max_iter)
+
 ### FedAVG SOLVE
-# alpha_fedavg = FedAVG(alpha_0, K_a, K_mm, y_a, sigma=0.5, nu=1.0, max_iter=n_iter, lr=step_size)
+alpha_fedavg = FedAVG(np.zeros((m,)), K_a, K_mm, y_a, sigma=0.5, nu=1.0, max_iter=n_iter, lr=step_size)
 
 
 # test de format : 
