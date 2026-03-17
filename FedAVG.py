@@ -1,9 +1,8 @@
 import numpy as np
 from utils import grad_a_batch
 
-def FedAVG(alpha_0, K_a, K_mm, y_a, sigma, nu, max_iter, lr):
+def FedAVG(alpha_0, K_a, K_mm, y_a, sigma, nu, max_iter, lr, E):
 
-    E = 10
     a = len(K_a) # number of agents
     num_points_per_agent = len(K_a[0]) # number of data points per agent
     # the data of each agent is divided in n_batches batches

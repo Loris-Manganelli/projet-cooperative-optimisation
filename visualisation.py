@@ -46,3 +46,24 @@ def make_reconstruction_graph(x, y,alpha, alpha_method, ind, n_iter, agent_index
     plt.savefig("files/RECONSTRUCTION.pdf")
 
     
+
+def make_FedAVG_graph(alpha, alpha_fedavg, pdf=True, title="files/FedAVG.pdf"):
+    plt.figure() # Create a new figure for the gap graph
+    font = {'family' : 'sans',
+        'size'   : 12}
+
+    matplotlib.rc('font', **font)
+
+    for (E, alphaList) in alpha_fedavg.items():
+        opt_gap = [np.linalg.norm(alpha_i - alpha) for alpha_i in alphaList]
+        plt.loglog(np.arange(1,len(opt_gap)+1), opt_gap, label=f"FedAVG with E={E}")
+    plt.xlabel('Number of iterations')
+    plt.ylabel(r'Optimality gap $|\alpha_i - \alpha^*|$')
+    plt.title('FedAVG : Optimality gap convergence on Kernel regression')
+    plt.grid()
+    plt.legend()
+    # plt.tight_layout()
+    if pdf:
+        plt.savefig(title)
+    else:
+        plt.show()
