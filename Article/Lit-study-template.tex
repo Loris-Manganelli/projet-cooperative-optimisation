@@ -67,6 +67,37 @@ assumptions:
     \item Neither devices, nor operator should have access to $y^{ij}$.
 \end{enumerate}
 
+`\subsection{Another Problem Formulation}
+
+We want to reformulate the following problem from the course: 
+
+\begin{equation*}
+    \min_{x\in \mathbb R^n} \sum_{i=1}^N f_i(x)
+\end{equation*}
+
+Donc en repennant le formalisme de l'article on obtient dans ce cas le problème reformulé suivant :
+
+\begin{equation*}
+    \begin{aligned}
+    &\min_{x^i\in\mathbb{R}^{n}, y^{ij}\in\mathbb{R}^{n}} \sum_{i=1}^{N} f_i(x^i)\\
+    \text{s.t } & y^{ij}=\zeta_{j} \quad \forall i\sim j & \textit{(neighboring constraint)}\\ 
+    & x^i=\zeta_i \quad \forall i \in M & \textit{(local constraint)}\\
+    & x^i=y^{ij} \quad \forall i\sim j & \textit{(local constraint)}
+    \end{aligned}
+\end{equation*}
+
+The problem formulation consists in finding a peer-to-peer algorithm which fulfilled the following as-
+sumptions:
+
+\begin{enumerate}
+    \item Only agent $i$ should have access to $x_i,f_i $.
+    \item Neither devices, nor the operator should have access to plaintext value of $\y_ij$.
+    \item Neither devices, nor operator should have access to plaintext values of$y^{ij}$.
+\end{enumerate}
+
+'
+
+
 \subsection{Assumptions}
 
 %Introduce the main assumptions that the paper needs to derive the theoretical results. [1 page max]
