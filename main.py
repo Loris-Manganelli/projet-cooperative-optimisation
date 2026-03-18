@@ -9,8 +9,21 @@ from Dual_decomposition import dual_decomposition
 from visualisation import make_gap_graph, make_reconstruction_graph, make_FedAVG_graph
 from FedAVG import FedAVG
 import matplotlib.pyplot as plt
+import warnings
+
+warnings.filterwarnings( # empecher les warning insupportables de numpy
+    "ignore",
+    category=DeprecationWarning,
+    message=".*numpy.core.numeric is deprecated.*"
+)
+
 with open('data/first_database.pkl', 'rb') as f:
    x,y = pickle.load(f)
+with open('data/second_database.pkl', 'rb') as f:
+   X,Y = pickle.load(f)
+
+
+
 
 
 ### PARAMETERS TO BE MODIFIED
@@ -28,7 +41,7 @@ A = np.ones([a,a])- np.eye(a)
 #     A[i,(i+1)%a] = 1
 #     A[(i+1)%a,i] = 1
 
-## DATA PREPARATION
+## DATA PREPARATION FOR FIRST DATABASE
 x = x[:num_points]
 y = y[:num_points]
 alpha, ind = solve(x[:num_points],y[:num_points], selection=True)
@@ -42,6 +55,19 @@ indices = np.random.permutation(n) # random permutation of the data points to be
 K_a = [K_nm[indices[i*points_per_agent:(i+1)*points_per_agent], :] for i in range(a)]
 y_a = [y[indices[i*points_per_agent:(i+1)*points_per_agent]] for i in range(a)]
 
+## DATA PREPARATION FOR SECOND DATABASE
+Xflat = [item for sublist in X for item in sublist]
+Yflat = [item for sublist in Y for item in sublist]
+ALPHA, IND = solve(Xflat,Yflat, selection=False)
+N = len(Xflat)
+M = int(np.sqrt(N))
+X2 = np.linspace(-1, 1, M)
+K_MM = Cov(X2)
+POINTS_PER_AGENT = N // a
+K_A = [Cov2(t, X2) for t in X]
+Y_A = Y
+
+
 # Other parameters
 # Initialization and parameters of DGD
 alpha_0 = np.zeros((a,m)) # Initialization of the local variables for each agent
@@ -49,15 +75,14 @@ n_iter = 50000
 step_size = 0.001
 sigma = 0.5
 nu = 1.0
-N = len(K_a) #number of agents
 
 alpha_0 = np.zeros((a,m)) # Initialization of the local variables for each agent
 multipliers_0 = np.zeros([int(np.sum(A)/2),m]) # Initialization of the multipliers for dual decomposition
 egalizers_0 = np.zeros((int(np.sum(A)/2),m)) # Initialization of the egalizers for dual decomposition
 
-######## SOLVES ###########################
+# ######## SOLVES ###########################
 
-### DGD SOLVE 
+## DGD SOLVE 
 alpha_dgd = DGD(alpha_0, K_a, K_mm, y_a, W, sigma=0.5, nu=1.0, max_iter=n_iter, lr=step_size)
 ### GT SOLVE
 alpha_gt = GT(alpha_0, K_a, K_mm, y_a, W, sigma=0.5, nu=1.0, max_iter=n_iter, lr=step_size)
@@ -72,22 +97,22 @@ gamma_list = [1/(1+0.001*k**0.9) for k in range(max_iter)]
 eps=1
 nu_list = [(0.01/eps)*1/(1+0.001*k**0.1) for k in range(max_iter)]
 alpha_dgd_dp = DGD_DP(K_a, K_mm, y_a, W, sigma, gamma_list, nu_list, lr_list, nu=1.0, max_iter=max_iter)
-### FedAVG SOLVE
-alpha_fedavg = { i:FedAVG(np.zeros((m,)), K_a, K_mm, y_a, sigma=0.5, nu=1.0, max_iter=n_iter, lr=0.002, E=i) for i in [1, 5, 50]}
+# ### FedAVG SOLVE
+alpha_fedavg = { i:FedAVG(np.zeros((m,)), K_A, K_MM, Y_A, sigma=0.5, nu=1.0, max_iter=10000, lr=0.002, E=i) for i in [1, 5, 50]}
 
 
-# test de format : 
-# print ("alpha_dgd shape : ", alpha_dgd[-1].shape)
-# print ("alpha_gt shape : ", alpha_gt[-1].shape)
-# print ("alpha_dualdecomp shape : ", alpha_dualdecomp[-1].shape)
+# # test de format : 
+# # print ("alpha_dgd shape : ", alpha_dgd[-1].shape)
+# # print ("alpha_gt shape : ", alpha_gt[-1].shape)
+# # print ("alpha_dualdecomp shape : ", alpha_dualdecomp[-1].shape)
 
-# PLOTS
-# plot_me(x[:num_points],y[:num_points], alpha, ind, selection=True)
+# # PLOTS
+# # plot_me(x[:num_points],y[:num_points], alpha, ind, selection=True)
 
 
 alphaDict = {'DGD': alpha_dgd, 'GT': alpha_gt, 'Dual Decomposition': alpha_dualdecomp, 'ADMM': alpha_admm, rf"DGD-DP $\epsilon = {eps}$": alpha_dgd_dp}
 make_reconstruction_graph(x[:num_points],y[:num_points], alpha, alpha_dgd[-1], ind, selection=True, n_iter=n_iter, method_name="DGD", nt=250, agent_index=0)
 make_gap_graph(alpha, alphaDict)
-make_FedAVG_graph(alpha, alpha_fedavg, K_a, K_mm, y_a, sigma, nu=1.0, a=a)
-
+make_FedAVG_graph(ALPHA, alpha_fedavg, K_A, K_MM, Y_A, sigma, nu=1.0, a=a)
+# make_reconstruction_graph(Xflat,Yflat, ALPHA, alpha_fedavg[1][-1], IND, selection=False, n_iter=n_iter, method_name="FedAVG with E=50", nt=250, agent_index=0)
 

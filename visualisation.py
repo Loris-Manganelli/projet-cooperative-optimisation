@@ -26,7 +26,7 @@ def make_gap_graph(alpha, alphaDict,pdf=True,precisionlimit=None,title="files/GA
     else:
         plt.show()
 
-def make_reconstruction_graph(x, y,alpha, alpha_method, ind, n_iter, agent_index, method_name, nt, selection=True,):
+def make_reconstruction_graph(x, y,alpha, alpha_method, ind, n_iter, agent_index, method_name, nt, selection=True):
     plt.figure() # Create a new figure for the reconstruction graph
     plt.plot(x,y,'o', label="Data")
     xo = np.linspace(-1,1,nt)
@@ -50,12 +50,12 @@ def make_reconstruction_graph(x, y,alpha, alpha_method, ind, n_iter, agent_index
 
 def make_FedAVG_graph(alpha, alpha_fedavg, K_a, K_mm, y_a, sigma, nu=1.0, a=5, pdf=True, title="files/FedAVG.pdf"):
 
-    alphaValue = sum([objective_a(alpha, k, K_a, K_mm, y_a, sigma, nu=1.0) for k in range(a)])
+    alphaValue = sum([objective_a(alpha, k, K_a, K_mm, y_a, sigma, nu=nu) for k in range(a)])
     alpha_fedavgValues = {E: [] for E in alpha_fedavg.keys()}
 
     for E in alpha_fedavg.keys():
         for t in range(len(alpha_fedavg[E])):
-            alpha_fedavgValues[E].append(sum([objective_a(alpha_fedavg[E][t], k, K_a, K_mm, y_a, sigma, nu=1.0) for k in range(a)]))
+            alpha_fedavgValues[E].append(sum([objective_a(alpha_fedavg[E][t], k, K_a, K_mm, y_a, sigma, nu=nu) for k in range(a)]))
     
     
 
@@ -67,7 +67,7 @@ def make_FedAVG_graph(alpha, alpha_fedavg, K_a, K_mm, y_a, sigma, nu=1.0, a=5, p
 
     for (E, valueList) in alpha_fedavgValues.items():
         opt_gap = [np.linalg.norm(alphaValueE - alphaValue) for alphaValueE in valueList]
-        plt.loglog(np.arange(1,len(opt_gap)+1), opt_gap, label=f"FedAVG with E={E}")
+        plt.loglog(np.arange(1,len(opt_gap)+1), opt_gap, label=f"E={E}")
     plt.xlabel('Number of iterations')
     plt.ylabel(r'Objective gap $|F(\alpha_i) - F(\alpha^*)|$')
     plt.title('FedAVG : Objective gap convergence on Kernel regression')

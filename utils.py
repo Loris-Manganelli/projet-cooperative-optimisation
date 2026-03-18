@@ -10,8 +10,8 @@ def grad_a(alpha, k, K_a, K_mm, y_a, sigma, nu=1.0): # gradient de la fonction d
 
 # For FedAVG
 def grad_a_batch(alpha, K_a_batch, K_mm, y_a_batch, sigma, N, nu=1.0): # gradient de la fonction de coût de l'agent k en utilisant les données de l'agent k
-    grad_k = K_a_batch.T @ (K_a_batch @ alpha - y_a_batch) + sigma**2*K_mm@alpha/N + nu*alpha/N
-    return grad_k
+    grad = K_a_batch.T @ (K_a_batch @ alpha - y_a_batch) + sigma**2*K_mm@alpha/N + nu*alpha/N
+    return grad
 
 # Compute the value of the objective function for agent k
 def objective_a(alpha, k, K_a, K_mm, y_a, sigma, nu=1.0):
