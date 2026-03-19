@@ -1,0 +1,34 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+
+\title{CoooperativeOptimizationProject}
+\author{Lucien LE GALL}
+\date{March 2026}
+
+\begin{document}
+
+\maketitle
+
+\section{Part I}
+\subsection{Decentralized gradient descent}
+\subsubsection{Justification of the step size}
+Let denote the agent $A_1, A_2, \dots, A_5$
+The function $f_i$ for each agent is:
+\begin{equation}
+    f_i(\alpha)=\dfrac{\sigma^2}{5}\dfrac{1}{2}\alpha^T K_{mm}\alpha+\dfrac{1}{2}\sum_{i\in A_i}(y_i-K_{(i)m}\alpha)^2+\dfrac{\nu}{10}\lVert \alpha \rVert^2
+\end{equation}
+One has:
+\begin{equation}
+    \nabla_{\alpha}f_i(\alpha)=\dfrac{\sigma^2}{5}K_{mm}\alpha-\sum_{i\in A_i}K_{(i)m}^T(y_i-K_{(i)m}\alpha) +\dfrac{\nu}{5}\alpha
+\end{equation}
+Then:
+\begin{equation}
+\nabla_{\alpha}^2f_i(\alpha)=\dfrac{\sigma^2}{5}K_{mm} + \sum_{i\in A_i} K_{(i)m}^T K_{(i)m}+\dfrac{\nu}{5}I_m
+\end{equation}
+
+
+
+So, let $\lambda_{i, \text{max}} = \arg\max_{\lambda \in \mathrm{Sp}\big(\nabla_{\alpha}^2 f_i(\alpha)\big)} |\lambda|$ for each agent $i$. Let $L=\max_i{|\lambda_{i, \text{max}}}|$. Then, we need to choose a step size which fulfilled is $\leq O\left(\dfrac{1}{L}\right)$.
+
+\end{document}
