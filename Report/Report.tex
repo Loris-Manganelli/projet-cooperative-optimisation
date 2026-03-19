@@ -1,9 +1,14 @@
-\documentclass{article}
+\documentclass[11pt]{article}
+
+% Related to page geometry
+\usepackage[a4paper,vmargin={2.4cm,2.4cm},hmargin={2.4cm,2.4cm}]{geometry}
 \usepackage[utf8]{inputenc}
 \usepackage{amsmath}
+\usepackage{caption}
+\usepackage{graphicx}
 
-\title{CoooperativeOptimizationProject}
-\author{Lucien LE GALL}
+\author{}
+\title{Report on Cooperative Optimization Project}
 \date{March 2026}
 
 \begin{document}
@@ -25,10 +30,23 @@ One has:
 Then:
 \begin{equation}
 \nabla_{\alpha}^2f_i(\alpha)=\dfrac{\sigma^2}{5}K_{mm} + \sum_{i\in A_i} K_{(i)m}^T K_{(i)m}+\dfrac{\nu}{5}I_m
-\end{equation}
+\end{equation}So, let $\lambda_{i, \text{max}} = \arg\max_{\lambda \in \mathrm{Sp}\big(\nabla_{\alpha}^2 f_i(\alpha)\big)} |\lambda|$ for each agent $i$. Let $L=\max_i{|\lambda_{i, \text{max}}}|$. Then, we need to choose a step size which fulfilled is $\leq O\left(\dfrac{1}{L}\right)$.
+\subsubsection{Plot convergence depending on graph structure}
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\textwidth]{Figures/DGD_GT_Fully_connected.pdf}
+\end{figure}
 
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\textwidth]{Figures/DGD_GT_small_world.pdf}
+\end{figure}
 
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\textwidth]{Figures/DGD_GT_line.pdf}
+\end{figure}
 
-So, let $\lambda_{i, \text{max}} = \arg\max_{\lambda \in \mathrm{Sp}\big(\nabla_{\alpha}^2 f_i(\alpha)\big)} |\lambda|$ for each agent $i$. Let $L=\max_i{|\lambda_{i, \text{max}}}|$. Then, we need to choose a step size which fulfilled is $\leq O\left(\dfrac{1}{L}\right)$.
+We observe that the more is connected the graph, the faster is convergence and the more there is consensus.
 
 \end{document}
