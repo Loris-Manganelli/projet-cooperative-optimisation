@@ -8,6 +8,20 @@ def grad_a(alpha, k, K_a, K_mm, y_a, sigma, nu=1.0): # gradient de la fonction d
     grad_k = K_a_k.T @ (K_a_k @ alpha - y_a_k) + sigma**2*K_mm@alpha/N + nu*alpha/N
     return grad_k
 
+# Construct the doubly stochastic matrix for DGD and GT
+def construct_W(A):
+    # Use Metropolise Matrix of page 15 of Lecture Notes
+    n = len(A)
+    # Compute the degree of each agent
+    deg = [np.sum(A[i,:]) for i in range(n)]
+    W = np.zeros((n,n))
+    for i in range(n):
+        for j in range(n):
+            if A[i][j]>0:
+                W[i][j] = 1/(1+max(deg[i],deg[j]))
+    W = W + np.diag([1-np.sum(W[i][j] for j in range(n)) for i in range(n)])
+    return W    
+
 # For FedAVG
 def grad_a_batch(alpha, K_a_batch, K_mm, y_a_batch, sigma, N, nu=1.0): # gradient de la fonction de coût de l'agent k en utilisant les données de l'agent k
     grad = K_a_batch.T @ (K_a_batch @ alpha - y_a_batch) + sigma**2*K_mm@alpha/N + nu*alpha/N

@@ -8,6 +8,7 @@ from GT import GT
 from Dual_decomposition import dual_decomposition
 from visualisation import make_gap_graph, make_reconstruction_graph, make_FedAVG_graph
 from FedAVG import FedAVG
+from utils import construct_W
 import matplotlib.pyplot as plt
 import warnings
 
@@ -33,9 +34,9 @@ step_size = 0.001
 
 # Graph topology :
 a = 5 # number of agents
-W = np.ones([a,a])/a # consensus matrix (fully connected graph) TO BE MODIFIED for other topologies
 #adjacency matrix of the graph (circular graph)
 A = np.ones([a,a])- np.eye(a) 
+W = construct_W(A)
 # A = np.zeros([a,a])
 # for i in range(a):
 #     A[i,(i+1)%a] = 1
