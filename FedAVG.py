@@ -6,7 +6,7 @@ def FedAVG(alpha_0, K_a, K_mm, y_a, sigma, nu, max_iter, lr, E):
     a = len(K_a) # number of agents
     num_points_per_agent = len(K_a[0]) # number of data points per agent
     # the data of each agent is divided in n_batches batches
-    n_batches = 1
+    n_batches = 1 # since B=20
     batch_size = num_points_per_agent // n_batches
     alpha = []
     alpha.append(alpha_0)
