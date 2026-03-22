@@ -86,17 +86,18 @@ Donc en repennant le formalisme de l'article on obtient dans ce cas le problème
     \end{aligned}
 \end{equation*}
 
+\textcolor{red}{Note: ici les $z_i$ sont $(x^i, y^{ij} \quad \forall j \sim i)$, et il n'y a pas de     $F_i$, $p_i$}
+
 The problem formulation consists in finding a peer-to-peer algorithm which fulfilled the following as-
 sumptions:
 
 \begin{enumerate}
-    \item Only agent $i$ should have access to $x_i,f_i $.
-    \item Neither devices, nor the operator should have access to plaintext value of $\y_ij$.
-    \item Neither devices, nor operator should have access to plaintext values of$y^{ij}$.
-\end{enumerate}
+    \item Only agent $i$ should have access to $x^i,f_i $.
+    \item  Neither the agents nor the operator should have access to plaintext values of any $y^{ij}$.        
+    \item Neither the agents nor the operator should have access to plaintext values of $\zeta$, with the exception that agent i may have access to those entries reflecting $x^i$.
+\end{enumerate}'
 
-'
-
+Once we saw how to link the problem from the course to the one in the article
 
 \subsection{Assumptions}
 
