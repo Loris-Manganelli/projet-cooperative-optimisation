@@ -54,10 +54,56 @@ def make_reconstruction_graph(x, y,alpha, alpha_method, ind, n_iter, agent_index
     plt.plot(xo, yo, color='red', linestyle='--', label=f"Reconstruction Agent {agent_index} after {n_iter} iterations")
     plt.xlabel(r'$x$ feature')
     plt.ylabel(r'$y$ label')
-    plt.title(f'Reconstruction of the function with {method_name} compared to the exact solution')
+    plt.title(f'Reconstruction with {method_name}')
     plt.grid()
     plt.legend()
     plt.savefig("files/RECONSTRUCTION.pdf")
+
+
+def make_reconstruction_comparaison_graph(x, y, alpha, reconstructions_dict, ind, agent_index, method_name, nt, selection=True):
+    """
+    reconstructions_dict : dictionnaire de forme {n_iter: alpha_method_at_that_iter}
+    """
+    plt.figure()
+    plt.plot(x, y, 'o', label="Data")
+    
+    xo = np.linspace(-1, 1, nt)
+    if selection:
+        x2 = [x[i] for i in ind]
+    else:
+        x2 = np.linspace(-1, 1, 10)
+
+
+    y_exact = Cov2(xo, x2) @ alpha
+    plt.plot(xo, y_exact, color='orange', linestyle='-', label="Optimal reconstruction")
+
+    #Fixer rouge et vert pour correspondre au plot du poly
+    fixed_colors = ['green', 'red']
+    n_items = len(reconstructions_dict)
+    
+    # On génère une palette pour les éventuelles courbes supplémentaires (au-delà de 2)
+    if n_items > 2:
+        extra_colors = plt.cm.viridis(np.linspace(0, 1, n_items - 2))
+    else:
+        extra_colors = []
+
+    for i, (n_iter, alpha_method) in enumerate(reconstructions_dict.items()):
+        if i <len(fixed_colors):
+            current_color=fixed_colors[i]
+        else:
+            current_color=extra_colors[i-2]
+        yo = Cov2(xo, x2) @ alpha_method[agent_index]
+        plt.plot(xo, yo, linestyle='--', color=current_color, 
+                 label=f"Reconstruction Agent {agent_index} after {n_iter} iterations")
+
+    plt.xlabel(r'$x$ feature')
+    plt.ylabel(r'$y$ label')
+    plt.title(f'Reconstruction with {method_name}')
+    plt.grid(True, which='both', linestyle='--')
+    plt.legend()
+    
+    plt.savefig("files/RECONSTRUCTION_COMPARISON.pdf")
+    plt.show()
 
     
 

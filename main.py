@@ -115,5 +115,5 @@ alphaDict = {'DGD': alpha_dgd, 'GT': alpha_gt, 'Dual Decomposition': alpha_duald
 make_reconstruction_graph(x[:num_points],y[:num_points], alpha, alpha_dgd[-1], ind, selection=True, n_iter=n_iter, method_name="DGD", nt=250, agent_index=0)
 make_gap_graph(alpha, alphaDict)
 make_FedAVG_graph(ALPHA, alpha_fedavg, K_A, K_MM, Y_A, sigma, nu=1.0, a=a)
-# make_reconstruction_graph(Xflat,Yflat, ALPHA, alpha_fedavg[1][-1], IND, selection=False, n_iter=n_iter, method_name="FedAVG with E=50", nt=250, agent_index=0)
+make_reconstruction_graph(x,y, alpha, alpha_gt[-1], ind, selection=True, n_iter=n_iter, method_name="GT", nt=250, agent_index=0)
 
