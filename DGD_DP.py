@@ -21,6 +21,6 @@ def DGD_DP(K_a, K_mm, y_a, W, sigma, gamma_list, nu_list, lr_list, nu=1.0, max_i
         grad = np.array([grad_a(alpha_temp[i], i, K_a, K_mm, y_a, sigma, nu) for i in range(a)])
         alpha_next = np.zeros((a,m))
         for i in range(a):
-            alpha_next[i] = alpha_temp[i]+(gamma_list[k]*W_hat@(chi-alpha_temp[i]))[i]-lr_list[k]*grad[i]
+            alpha_next[i] = alpha_temp[i]+(gamma_list[k]*W_hat[i,:]@(chi-alpha_temp[i]))-lr_list[k]*grad[i]
         alpha.append(alpha_next)
     return alpha
