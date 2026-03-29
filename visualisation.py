@@ -143,7 +143,7 @@ import matplotlib
 import numpy as np
 import os
 
-def make_gap_graph_with_tikz(alpha, alphaDict, A, W, lr, precisionlimit=None):
+def make_gap_graph_with_tikz(alpha, alphaDict, A, W, lr, precisionlimit=None, title="DGD_GT"):
     plt.figure() # Create a new figure for the gap graph
     font = {'family' : 'sans',
         'size'   : 12}
@@ -174,7 +174,7 @@ def make_gap_graph_with_tikz(alpha, alphaDict, A, W, lr, precisionlimit=None):
     plt.legend()
 
     # Sauvegarde du fond
-    plt.savefig("files/plot_background_DGD_GT.pdf", bbox_inches='tight')
+    plt.savefig(f"files/plot_background_{title}.pdf", bbox_inches='tight')
     plt.close()
 
     #Conversion de la matrice W en chaîne LaTeX (Fractions dynamiques) ---
@@ -209,7 +209,7 @@ def make_gap_graph_with_tikz(alpha, alphaDict, A, W, lr, precisionlimit=None):
 \usepackage{amsmath}
 \begin{document}
 \begin{tikzpicture}
-    \node[anchor=south west, inner sep=0] (image) at (0,0) {\includegraphics[width=12cm]{plot_background_DGD_GT.pdf}};
+    \node[anchor=south west, inner sep=0] (image) at (0,0) {\includegraphics[width=12cm]{plot_background_""" + title + r""".pdf}};
     \begin{scope}[x={(image.south east)}, y={(image.north west)}]
         
         % Graphe d'adjacence A
@@ -241,7 +241,7 @@ def make_gap_graph_with_tikz(alpha, alphaDict, A, W, lr, precisionlimit=None):
 \end{tikzpicture}
 \end{document}
 """
-    with open("files/DGD_GT.tex", "w") as f:
+    with open(f"files/{title}.tex", "w") as f:
         f.write(tex_content)
     
-    print("Fichiers 'plot_background_DGD_GT.pdf' et 'DGD_GT.tex' générés.")
+    print(f"Fichiers 'plot_background_{title}.pdf' et '{title}.tex' générés.")
