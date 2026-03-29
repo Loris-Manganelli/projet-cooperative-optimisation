@@ -176,7 +176,7 @@ def make_gap_graph_with_tikz(alpha, alphaDict, A, W, lr, precisionlimit=None, ti
     # Sauvegarde du fond
     plt.savefig(f"files/plot_background_{title}.pdf", bbox_inches='tight')
     plt.close()
-    if W!=None: 
+    if W is not None: 
         #Conversion de la matrice W en chaîne LaTeX (Fractions dynamiques) ---
         matrix_rows = []
         for row in W:
@@ -203,6 +203,15 @@ def make_gap_graph_with_tikz(alpha, alphaDict, A, W, lr, precisionlimit=None, ti
         latex_matrix = " \\\\\n            ".join(matrix_rows)
     else:
         latex_matrix = "W not provided"
+    if lr is not None:
+            
+        stext=r"""
+            \node[anchor=south west] at (0.75, 0.25) {
+                $s = """ + str(lr) + r"""$
+            };
+        """
+    else:
+        stext=r""
     #Génération du fichier .tex dynamique ---
     tex_content = r"""\documentclass{standalone}
 \usepackage{graphicx}
@@ -234,10 +243,7 @@ def make_gap_graph_with_tikz(alpha, alphaDict, A, W, lr, precisionlimit=None, ti
             \end{bmatrix}$
         };
 
-        % Step-size lr dynamique
-        \node[anchor=south west] at (0.75, 0.25) {
-            $s = """ + str(lr) + r"""$
-        };
+        % Step-size lr dynamique""" + stext + r"""
     \end{scope}
 \end{tikzpicture}
 \end{document}

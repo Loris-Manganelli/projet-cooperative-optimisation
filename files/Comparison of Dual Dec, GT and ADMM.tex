@@ -4,7 +4,7 @@
 \usepackage{amsmath}
 \begin{document}
 \begin{tikzpicture}
-    \node[anchor=south west, inner sep=0] (image) at (0,0) {\includegraphics[width=12cm]{plot_background_Dual Dec vs GT.pdf}};
+    \node[anchor=south west, inner sep=0] (image) at (0,0) {\includegraphics[width=12cm]{plot_background_Comparison of Dual Dec, GT and ADMM.pdf}};
     \begin{scope}[x={(image.south east)}, y={(image.north west)}]
         
         % Graphe d'adjacence A
@@ -22,20 +22,15 @@
         % Matrice W dynamique
         \node[anchor=south] at (0.52, 0.2) {
             $I = \begin{bmatrix} 
-            1 & -1 & 0 & 0 & 0 \\
-            1 & 0 & -1 & 0 & 0 \\
-            0 & 1 & -1 & 0 & 0 \\
-            0 & 1 & 0 & -1 & 0 \\
-            0 & 0 & 1 & 0 & -1 \\
-            0 & 0 & 0 & 1 & -1
+            0 & 1 & 1 & 0 & 0 \\
+            1 & 0 & 1 & 1 & 0 \\
+            1 & 1 & 0 & 0 & 1 \\
+            0 & 1 & 0 & 0 & 1 \\
+            0 & 0 & 1 & 1 & 0
             \end{bmatrix}$
         };
 
         % Step-size lr dynamique
-            \node[anchor=south west] at (0.75, 0.25) {
-                $s = 0.07$
-            };
-        
     \end{scope}
 \end{tikzpicture}
 \end{document}
