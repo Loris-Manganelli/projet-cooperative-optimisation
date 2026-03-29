@@ -1,5 +1,6 @@
 from utils import grad_a
 import numpy as np
+import utils as ut
 
 def Solve_Lagrange(K_a,K_mm,y_a,sigma,nu,k,multiplier,Am):  
     """
@@ -58,6 +59,7 @@ def dual_decomposition(multiplier_0,K_a, K_mm, y_a, A, sigma, nu=1.0, max_iter=1
     N=len(K_a)
     m=len(K_mm)
     Am=build_constraint_matrices(A, m)
+    Am=ut.incidence_oriented(A)
 
 
     for _ in range(max_iter):
