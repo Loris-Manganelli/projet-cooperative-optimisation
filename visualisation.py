@@ -171,37 +171,38 @@ def make_gap_graph_with_tikz(alpha, alphaDict, A, W, lr, precisionlimit=None, ti
     plt.ylabel(r'Optimality gap $|\alpha_i - \alpha^*|$')
     plt.title('Convergence of optimality gap on Kernel ridge regression')
     plt.grid()
-    plt.legend()
+    plt.legend(loc ="upper right")
 
     # Sauvegarde du fond
     plt.savefig(f"files/plot_background_{title}.pdf", bbox_inches='tight')
     plt.close()
-
-    #Conversion de la matrice W en chaîne LaTeX (Fractions dynamiques) ---
-    matrix_rows = []
-    for row in W:
-        items = []
-        for val in row:
-            # On vérifie si la valeur est strictement positive (seuil epsilon)
-            if val > 1e-5:
-                # Détection des fractions spécifiques
-                if abs(val - 1/3) < 1e-3:
-                    items.append(r"\frac{1}{3}")
-                elif abs(val - 2/3) < 1e-3:
-                    items.append(r"\frac{2}{3}")
-                elif abs(val - 1/5) < 1e-3:
-                    items.append(r"\frac{1}{5}")
+    if W!=None: 
+        #Conversion de la matrice W en chaîne LaTeX (Fractions dynamiques) ---
+        matrix_rows = []
+        for row in W:
+            items = []
+            for val in row:
+                # On vérifie si la valeur est strictement positive (seuil epsilon)
+                if val > -5:
+                    # Détection des fractions spécifiques
+                    if abs(val - 1/3) < 1e-3:
+                        items.append(r"\frac{1}{3}")
+                    elif abs(val - 2/3) < 1e-3:
+                        items.append(r"\frac{2}{3}")
+                    elif abs(val - 1/5) < 1e-3:
+                        items.append(r"\frac{1}{5}")
+                    else:
+                        # Pour les autres valeurs, on affiche 2 décimales proprement
+                        items.append(f"{val:.2f}".rstrip('0').rstrip('.'))
                 else:
-                    # Pour les autres valeurs, on affiche 2 décimales proprement
-                    items.append(f"{val:.2f}".rstrip('0').rstrip('.'))
-            else:
-                # Cellule vide pour W = 0
-                items.append(" ") 
+                    # Cellule vide pour W = 0
+                    items.append(" ") 
+            
+            matrix_rows.append(" & ".join(items))
         
-        matrix_rows.append(" & ".join(items))
-    
-    latex_matrix = " \\\\\n            ".join(matrix_rows)
-
+        latex_matrix = " \\\\\n            ".join(matrix_rows)
+    else:
+        latex_matrix = "W not provided"
     #Génération du fichier .tex dynamique ---
     tex_content = r"""\documentclass{standalone}
 \usepackage{graphicx}
@@ -228,7 +229,7 @@ def make_gap_graph_with_tikz(alpha, alphaDict, A, W, lr, precisionlimit=None, ti
 
         % Matrice W dynamique
         \node[anchor=south] at (0.52, 0.2) {
-            $W = \begin{bmatrix} 
+            $I = \begin{bmatrix} 
             """ + latex_matrix + r"""
             \end{bmatrix}$
         };

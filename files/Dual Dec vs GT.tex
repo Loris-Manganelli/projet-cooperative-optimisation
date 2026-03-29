@@ -15,24 +15,29 @@
                     \node (n\i) at ({360/5 * \i}:1cm) {};
                 }
                 % Dessin des arretes si A[i,j] > 0
-                \draw (n1) -- (n2); \draw (n2) -- (n3); \draw (n3) -- (n4); \draw (n4) -- (n5); 
+                \draw (n1) -- (n2); \draw (n1) -- (n3); \draw (n1) -- (n4); \draw (n1) -- (n5); \draw (n2) -- (n3); \draw (n2) -- (n4); \draw (n2) -- (n5); \draw (n3) -- (n4); \draw (n3) -- (n5); \draw (n4) -- (n5); 
             \end{tikzpicture}
         };
 
         % Matrice W dynamique
         \node[anchor=south] at (0.52, 0.2) {
-            $W = \begin{bmatrix} 
-            \frac{2}{3} & \frac{1}{3} &   &   &   \\
-            \frac{1}{3} & \frac{1}{3} & \frac{1}{3} &   &   \\
-              & \frac{1}{3} & \frac{1}{3} & \frac{1}{3} &   \\
-              &   & \frac{1}{3} & \frac{1}{3} & \frac{1}{3} \\
-              &   &   & \frac{1}{3} & \frac{2}{3}
+            $I = \begin{bmatrix} 
+            1 & -1 & 0 & 0 & 0 \\
+            1 & 0 & -1 & 0 & 0 \\
+            1 & 0 & 0 & -1 & 0 \\
+            1 & 0 & 0 & 0 & -1 \\
+            0 & 1 & -1 & 0 & 0 \\
+            0 & 1 & 0 & -1 & 0 \\
+            0 & 1 & 0 & 0 & -1 \\
+            0 & 0 & 1 & -1 & 0 \\
+            0 & 0 & 1 & 0 & -1 \\
+            0 & 0 & 0 & 1 & -1
             \end{bmatrix}$
         };
 
         % Step-size lr dynamique
         \node[anchor=south west] at (0.75, 0.25) {
-            $s = 0.1$
+            $s = 0.05$
         };
     \end{scope}
 \end{tikzpicture}
