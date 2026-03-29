@@ -17,9 +17,9 @@ def construct_W(A):
     W = np.zeros((n,n))
     for i in range(n):
         for j in range(n):
-            if A[i][j]>0:
+            if A[i][j]>0.5:
                 W[i][j] = 1/(1+max(deg[i],deg[j]))
-    W = W + np.diag([1-np.sum(W[i][j] for j in range(n)) for i in range(n)])
+    W = W + np.diag(1 - W.sum(axis=1))
     return W    
 
 # For FedAVG
@@ -91,3 +91,14 @@ def incidence(adj):
         Am[e][j] = 1
     
     return Am
+
+if __name__ == "__main__":
+    print("Testing incidence and anti-incidence matrices...")
+    # Example usage
+    A = np.array([[0, 1, 1, 1],
+                  [1, 0, 0, 0],
+                  [1, 0, 0, 1],
+                  [1, 0, 1, 0]])
+    
+    W= construct_W(A)
+    print("W:\n", W)
