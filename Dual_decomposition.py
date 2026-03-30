@@ -1,5 +1,6 @@
 from utils import grad_a
 import numpy as np
+import utils as ut
 
 def Solve_Lagrange(K_a,K_mm,y_a,sigma,nu,k,multiplier,Am):  
     """
@@ -16,6 +17,13 @@ def Solve_Lagrange(K_a,K_mm,y_a,sigma,nu,k,multiplier,Am):
     """
     N=len(K_a)
     #print("Shape of multiplier.T@Am[k]:", multiplier.T.shape)
+    # """print all shapes"""
+    # print("Shape of K_a[k]:", K_a[k].shape)
+    # print("Shape of K_mm:", K_mm.shape)
+    # print("Shape of y_a[k]:", y_a[k].shape)
+    # print("Shape of multiplier:", multiplier.shape)
+    # print("Shape of Am[:,k]:", Am[:,k].shape)
+
     return np.linalg.solve(K_a[k].T @ K_a[k] + (1/N)*sigma**2*K_mm + nu/(N)*np.eye(K_mm.shape[0]), K_a[k].T @ y_a[k]-multiplier.T@Am[:,k])
 
 
@@ -58,6 +66,7 @@ def dual_decomposition(multiplier_0,K_a, K_mm, y_a, A, sigma, nu=1.0, max_iter=1
     N=len(K_a)
     m=len(K_mm)
     Am=build_constraint_matrices(A, m)
+    Am=ut.incidence_oriented(A)
 
 
     for _ in range(max_iter):
@@ -70,3 +79,4 @@ def dual_decomposition(multiplier_0,K_a, K_mm, y_a, A, sigma, nu=1.0, max_iter=1
 # print(build_constraint_matrices(np.array([[0,1,1],[1,0,1],[1,1,0]]), 2)[1]) #test
 A=np.ones([3,3])-np.eye(3)
 #print(np.kron(A, np.eye(2)))
+

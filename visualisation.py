@@ -107,7 +107,10 @@ def make_reconstruction_comparaison_graph(x, y, alpha, reconstructions_dict, ind
 
     
 
-def make_FedAVG_graph(alpha, alpha_fedavg, K_a, K_mm, y_a, sigma, nu=1.0, a=5, pdf=True, title="files/FedAVG.pdf"):
+def make_FedAVG_graph(alpha, alpha_fedavg, K_a, K_mm, y_a, sigma, nu=1.0, a=5, pdf=True, parameters={"E":None, "B":20, "C":5}, title="files/FedAVG.pdf"):
+    
+    parameterVarying = next((k for k, v in parameters.items() if v is None), None)
+    fixedParameters = {k:v for k,v in parameters.items() if v is not None}
 
     alphaValue = sum([objective_a(alpha, k, K_a, K_mm, y_a, sigma, nu=nu) for k in range(a)])
     alpha_fedavgValues = {E: [] for E in alpha_fedavg.keys()}
@@ -125,11 +128,18 @@ def make_FedAVG_graph(alpha, alpha_fedavg, K_a, K_mm, y_a, sigma, nu=1.0, a=5, p
     matplotlib.rc('font', **font)
 
     for (E, valueList) in alpha_fedavgValues.items():
+
+        if parameterVarying == "E":
+            nEpochs = E
+        else :
+            nEpochs = parameters["E"]
+
         opt_gap = [np.linalg.norm(alphaValueE - alphaValue) for alphaValueE in valueList]
-        plt.loglog(np.arange(1,len(opt_gap)+1), opt_gap, label=f"E={E}")
+        plt.loglog([t*nEpochs for t in range(len(opt_gap))], opt_gap, label=parameterVarying+f"={E}")
+    plt.xlim(1, 1e4)
     plt.xlabel('Number of iterations')
     plt.ylabel(r'Objective gap $|F(\alpha_i) - F(\alpha^*)|$')
-    plt.title('FedAVG : Objective gap convergence on Kernel regression')
+    plt.title('FedAVG : Objective gap convergence, ' + ', '.join([f"{k}={v}" for k, v in fixedParameters.items()]))
     plt.grid()
     plt.legend()
     # plt.tight_layout()
@@ -143,7 +153,7 @@ import matplotlib
 import numpy as np
 import os
 
-def make_gap_graph_with_tikz(alpha, alphaDict, A, W, lr, precisionlimit=None):
+def make_gap_graph_with_tikz(alpha, alphaDict, A, W, lr, precisionlimit=None, title="DGD_GT"):
     plt.figure() # Create a new figure for the gap graph
     font = {'family' : 'sans',
         'size'   : 12}
@@ -171,37 +181,47 @@ def make_gap_graph_with_tikz(alpha, alphaDict, A, W, lr, precisionlimit=None):
     plt.ylabel(r'Optimality gap $|\alpha_i - \alpha^*|$')
     plt.title('Convergence of optimality gap on Kernel ridge regression')
     plt.grid()
-    plt.legend()
+    plt.legend(loc ="upper right")
 
     # Sauvegarde du fond
-    plt.savefig("files/plot_background_DGD_GT.pdf", bbox_inches='tight')
+    plt.savefig(f"files/plot_background_{title}.pdf", bbox_inches='tight')
     plt.close()
-
-    #Conversion de la matrice W en chaîne LaTeX (Fractions dynamiques) ---
-    matrix_rows = []
-    for row in W:
-        items = []
-        for val in row:
-            # On vérifie si la valeur est strictement positive (seuil epsilon)
-            if val > 1e-5:
-                # Détection des fractions spécifiques
-                if abs(val - 1/3) < 1e-3:
-                    items.append(r"\frac{1}{3}")
-                elif abs(val - 2/3) < 1e-3:
-                    items.append(r"\frac{2}{3}")
-                elif abs(val - 1/5) < 1e-3:
-                    items.append(r"\frac{1}{5}")
+    if W is not None: 
+        #Conversion de la matrice W en chaîne LaTeX (Fractions dynamiques) ---
+        matrix_rows = []
+        for row in W:
+            items = []
+            for val in row:
+                # On vérifie si la valeur est strictement positive (seuil epsilon)
+                if val > -5:
+                    # Détection des fractions spécifiques
+                    if abs(val - 1/3) < 1e-3:
+                        items.append(r"\frac{1}{3}")
+                    elif abs(val - 2/3) < 1e-3:
+                        items.append(r"\frac{2}{3}")
+                    elif abs(val - 1/5) < 1e-3:
+                        items.append(r"\frac{1}{5}")
+                    else:
+                        # Pour les autres valeurs, on affiche 2 décimales proprement
+                        items.append(f"{val:.2f}".rstrip('0').rstrip('.'))
                 else:
-                    # Pour les autres valeurs, on affiche 2 décimales proprement
-                    items.append(f"{val:.2f}".rstrip('0').rstrip('.'))
-            else:
-                # Cellule vide pour W = 0
-                items.append(" ") 
+                    # Cellule vide pour W = 0
+                    items.append(" ") 
+            
+            matrix_rows.append(" & ".join(items))
         
-        matrix_rows.append(" & ".join(items))
-    
-    latex_matrix = " \\\\\n            ".join(matrix_rows)
-
+        latex_matrix = " \\\\\n            ".join(matrix_rows)
+    else:
+        latex_matrix = "W not provided"
+    if lr is not None:
+            
+        stext=r"""
+            \node[anchor=south west] at (0.75, 0.25) {
+                $s = """ + str(lr) + r"""$
+            };
+        """
+    else:
+        stext=r""
     #Génération du fichier .tex dynamique ---
     tex_content = r"""\documentclass{standalone}
 \usepackage{graphicx}
@@ -209,7 +229,7 @@ def make_gap_graph_with_tikz(alpha, alphaDict, A, W, lr, precisionlimit=None):
 \usepackage{amsmath}
 \begin{document}
 \begin{tikzpicture}
-    \node[anchor=south west, inner sep=0] (image) at (0,0) {\includegraphics[width=12cm]{plot_background_DGD_GT.pdf}};
+    \node[anchor=south west, inner sep=0] (image) at (0,0) {\includegraphics[width=12cm]{plot_background_""" + title + r""".pdf}};
     \begin{scope}[x={(image.south east)}, y={(image.north west)}]
         
         % Graphe d'adjacence A
@@ -228,20 +248,17 @@ def make_gap_graph_with_tikz(alpha, alphaDict, A, W, lr, precisionlimit=None):
 
         % Matrice W dynamique
         \node[anchor=south] at (0.52, 0.2) {
-            $W = \begin{bmatrix} 
+            $I = \begin{bmatrix} 
             """ + latex_matrix + r"""
             \end{bmatrix}$
         };
 
-        % Step-size lr dynamique
-        \node[anchor=south west] at (0.75, 0.25) {
-            $s = """ + str(lr) + r"""$
-        };
+        % Step-size lr dynamique""" + stext + r"""
     \end{scope}
 \end{tikzpicture}
 \end{document}
 """
-    with open("files/DGD_GT.tex", "w") as f:
+    with open(f"files/{title}.tex", "w") as f:
         f.write(tex_content)
     
-    print("Fichiers 'plot_background_DGD_GT.pdf' et 'DGD_GT.tex' générés.")
+    print(f"Fichiers 'plot_background_{title}.pdf' et '{title}.tex' générés.")

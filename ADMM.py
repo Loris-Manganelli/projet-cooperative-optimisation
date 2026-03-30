@@ -18,7 +18,13 @@ def Solve_Augmented_Lagrangian(K_a,K_mm,y_a,sigma,nu,k,multiplier,egalizer,Incid
     :param dout: degree out of each node of the graph
     """
     N=len(K_a)
-    #print("Shape of multiplier.T@Am[k]:", multiplier.T.shape)
+    #print all shapes
+    # print("Shape of multiplier:", multiplier.shape)
+    # print("Shape of K_a[k]:", K_a[k].shape)
+    # print("Shape of K_mm:", K_mm.shape)
+    # print("Shape of Incid[:,k]:", Incid[:,k].shape)
+    # print("Shape of Anti_Incid[:,k]:", Anti_Incid[:,k].shape)
+
     return np.linalg.solve(K_a[k].T @ K_a[k] + (1/N)*sigma**2*K_mm + (beta*dout+nu/(N))*np.eye(K_mm.shape[0]), K_a[k].T @ y_a[k]+beta*Incid[:,k].T @ egalizer-Anti_Incid[:,k].T @ multiplier)
 
 

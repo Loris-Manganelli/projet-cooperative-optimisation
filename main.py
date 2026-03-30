@@ -69,8 +69,8 @@ K_A = [Cov2(t, X2) for t in X]
 Y_A = Y
 
 
-# Other parameters
-# Initialization and parameters of DGD
+# Other parameters initialization
+
 alpha_0 = np.zeros((a,m)) # Initialization of the local variables for each agent
 n_iter = 50000
 step_size = 0.001
@@ -81,25 +81,36 @@ alpha_0 = np.zeros((a,m)) # Initialization of the local variables for each agent
 multipliers_0 = np.zeros([int(np.sum(A)/2),m]) # Initialization of the multipliers for dual decomposition
 egalizers_0 = np.zeros((int(np.sum(A)/2),m)) # Initialization of the egalizers for dual decomposition
 
-# ######## SOLVES ###########################
+# # ######## SOLVES ###########################
 
-## DGD SOLVE 
-alpha_dgd = DGD(alpha_0, K_a, K_mm, y_a, W, sigma=0.5, nu=1.0, max_iter=n_iter, lr=step_size)
-### GT SOLVE
-alpha_gt = GT(alpha_0, K_a, K_mm, y_a, W, sigma=0.5, nu=1.0, max_iter=n_iter, lr=step_size)
-### DUAL DECOMPOSITION SOLVE
-alpha_dualdecomp, multipliers = dual_decomposition(multipliers_0, K_a, K_mm, y_a, np.ones([a, a]), sigma=0.5, nu=1.0, max_iter=n_iter, lr=10*step_size)   
-### ADMM SOLVE
-alpha_admm, multipliers_admm = ADMM(multipliers_0, egalizers_0, beta=1, K_a=K_a, K_mm=K_mm, y_a=y_a, A=np.ones([a,a])-np.eye(a), sigma=0.5, nu=1.0, max_iter=n_iter)
-### DGD-DP SOLVE
-max_iter = 100000
-lr_list = [0.002/(1+0.001*k) for k in range(max_iter)]
-gamma_list = [1/(1+0.001*k**0.9) for k in range(max_iter)]
-eps=1
-nu_list = [(0.01/eps)*1/(1+0.001*k**0.1) for k in range(max_iter)]
-alpha_dgd_dp = DGD_DP(K_a, K_mm, y_a, W, sigma, gamma_list, nu_list, lr_list, nu=1.0, max_iter=max_iter)
+# ## DGD SOLVE 
+# alpha_dgd = DGD(alpha_0, K_a, K_mm, y_a, W, sigma=0.5, nu=1.0, max_iter=n_iter, lr=step_size)
+# ### GT SOLVE
+# alpha_gt = GT(alpha_0, K_a, K_mm, y_a, W, sigma=0.5, nu=1.0, max_iter=n_iter, lr=step_size)
+# ### DUAL DECOMPOSITION SOLVE
+# alpha_dualdecomp, multipliers = dual_decomposition(multipliers_0, K_a, K_mm, y_a, np.ones([a, a]), sigma=0.5, nu=1.0, max_iter=n_iter, lr=10*step_size)   
+# ### ADMM SOLVE
+# alpha_admm, multipliers_admm = ADMM(multipliers_0, egalizers_0, beta=1, K_a=K_a, K_mm=K_mm, y_a=y_a, A=np.ones([a,a])-np.eye(a), sigma=0.5, nu=1.0, max_iter=n_iter)
+# ### DGD-DP SOLVE
+# max_iter = 100000
+# lr_list = [0.002/(1+0.001*k) for k in range(max_iter)]
+# gamma_list = [1/(1+0.001*k**0.9) for k in range(max_iter)]
+# eps=1
+# nu_list = [(0.01/eps)*1/(1+0.001*k**0.1) for k in range(max_iter)]
+# alpha_dgd_dp = DGD_DP(K_a, K_mm, y_a, W, sigma, gamma_list, nu_list, lr_list, nu=1.0, max_iter=max_iter)
 # ### FedAVG SOLVE
-alpha_fedavg = { i:FedAVG(np.zeros((m,)), K_A, K_MM, Y_A, sigma=0.5, nu=1.0, max_iter=10000, lr=0.002, E=i) for i in [1, 5, 50]}
+
+# For E varying 
+# alpha_fedavg = { i:FedAVG(np.zeros((m,)), K_A, K_MM, Y_A, sigma=0.5, nu=1.0, max_iter=10000, lr=0.002, E=i, B=20, C=5) for i in [1, 5, 50]}
+# PARAMETERS = {"E": None, "B": 20, "C": 5}
+
+# For B varying
+# alpha_fedavg = { i:FedAVG(np.zeros((m,)), K_A, K_MM, Y_A, sigma=0.5, nu=1.0, max_iter=10000, lr=0.002, E=5, B=i, C=5) for i in [20, 10, 5]}
+# PARAMETERS = {"E": 5, "B": None, "C": 5}
+
+# For C varying
+alpha_fedavg = { i:FedAVG(np.zeros((m,)), K_A, K_MM, Y_A, sigma=0.5, nu=1.0, max_iter=10000, lr=0.002, E=5, B=20, C=i) for i in [5, 4, 3, 2]}
+PARAMETERS = {"E": 5, "B": 20, "C": None}
 
 
 # # test de format : 
@@ -111,9 +122,10 @@ alpha_fedavg = { i:FedAVG(np.zeros((m,)), K_A, K_MM, Y_A, sigma=0.5, nu=1.0, max
 # # plot_me(x[:num_points],y[:num_points], alpha, ind, selection=True)
 
 
-alphaDict = {'DGD': alpha_dgd, 'GT': alpha_gt, 'Dual Decomposition': alpha_dualdecomp, 'ADMM': alpha_admm, rf"DGD-DP $\epsilon = {eps}$": alpha_dgd_dp}
-make_reconstruction_graph(x[:num_points],y[:num_points], alpha, alpha_dgd[-1], ind, selection=True, n_iter=n_iter, method_name="DGD", nt=250, agent_index=0)
-make_gap_graph(alpha, alphaDict)
-make_FedAVG_graph(ALPHA, alpha_fedavg, K_A, K_MM, Y_A, sigma, nu=1.0, a=a)
-make_reconstruction_graph(x,y, alpha, alpha_gt[-1], ind, selection=True, n_iter=n_iter, method_name="GT", nt=250, agent_index=0)
+# alphaDict = {'DGD': alpha_dgd, 'GT': alpha_gt, 'Dual Decomposition': alpha_dualdecomp, 'ADMM': alpha_admm, rf"DGD-DP $\epsilon = {eps}$": alpha_dgd_dp}
+# make_reconstruction_graph(x[:num_points],y[:num_points], alpha, alpha_dgd[-1], ind, selection=True, n_iter=n_iter, method_name="DGD", nt=250, agent_index=0)
+# make_gap_graph(alpha, alphaDict)
+# make_reconstruction_graph(x,y, alpha, alpha_gt[-1], ind, selection=True, n_iter=n_iter, method_name="GT", nt=250, agent_index=0)
+
+make_FedAVG_graph(ALPHA, alpha_fedavg, K_A, K_MM, Y_A, sigma, nu=1.0, a=a, parameters=PARAMETERS, title="files/FedAVG.pdf")
 
