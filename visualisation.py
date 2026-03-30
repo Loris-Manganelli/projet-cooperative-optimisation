@@ -94,7 +94,7 @@ def make_reconstruction_comparaison_graph(x, y, alpha, reconstructions_dict, ind
             current_color=extra_colors[i-2]
         yo = Cov2(xo, x2) @ alpha_method[agent_index]
         plt.plot(xo, yo, linestyle='--', color=current_color, 
-                 label=f"Reconstruction Agent {agent_index} after {n_iter} iterations")
+                 label=f"Reconstruction Agent {agent_index+1} after {n_iter} iterations")
 
     plt.xlabel(r'$x$ feature')
     plt.ylabel(r'$y$ label')
