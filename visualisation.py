@@ -107,7 +107,10 @@ def make_reconstruction_comparaison_graph(x, y, alpha, reconstructions_dict, ind
 
     
 
-def make_FedAVG_graph(alpha, alpha_fedavg, K_a, K_mm, y_a, sigma, nu=1.0, a=5, pdf=True, title="files/FedAVG.pdf"):
+def make_FedAVG_graph(alpha, alpha_fedavg, K_a, K_mm, y_a, sigma, nu=1.0, a=5, pdf=True, parameters={"E":None, "B":20, "C":5}, title="files/FedAVG.pdf"):
+    
+    parameterVarying = next((k for k, v in parameters.items() if v is None), None)
+    fixedParameters = {k:v for k,v in parameters.items() if v is not None}
 
     alphaValue = sum([objective_a(alpha, k, K_a, K_mm, y_a, sigma, nu=nu) for k in range(a)])
     alpha_fedavgValues = {E: [] for E in alpha_fedavg.keys()}
@@ -125,11 +128,18 @@ def make_FedAVG_graph(alpha, alpha_fedavg, K_a, K_mm, y_a, sigma, nu=1.0, a=5, p
     matplotlib.rc('font', **font)
 
     for (E, valueList) in alpha_fedavgValues.items():
+
+        if parameterVarying == "E":
+            nEpochs = E
+        else :
+            nEpochs = parameters["E"]
+
         opt_gap = [np.linalg.norm(alphaValueE - alphaValue) for alphaValueE in valueList]
-        plt.loglog(np.arange(1,len(opt_gap)+1), opt_gap, label=f"E={E}")
+        plt.loglog([t*nEpochs for t in range(len(opt_gap))], opt_gap, label=parameterVarying+f"={E}")
+    plt.xlim(1, 1e4)
     plt.xlabel('Number of iterations')
     plt.ylabel(r'Objective gap $|F(\alpha_i) - F(\alpha^*)|$')
-    plt.title('FedAVG : Objective gap convergence on Kernel regression')
+    plt.title('FedAVG : Objective gap convergence, ' + ', '.join([f"{k}={v}" for k, v in fixedParameters.items()]))
     plt.grid()
     plt.legend()
     # plt.tight_layout()
