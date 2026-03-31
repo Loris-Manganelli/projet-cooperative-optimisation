@@ -43,7 +43,7 @@ import tenseal as ts #alternative à OpenFHE
 def ADMM_HE(K_a, K_mm, y_a, sigma=0.5, nu=1.0, rho=1.0, max_iter=10):
     N, m = len(K_a), K_mm.shape[0]
 
-    #Définition des paramètres de chiffrement homomorphe
+    #Définition des paramètres de chiffrement homomorphe (boite noire de TenSEAL, gestion du mapping)
     context = ts.context(
         ts.SCHEME_TYPE.CKKS,
         poly_modulus_degree=16384,
@@ -62,6 +62,9 @@ def ADMM_HE(K_a, K_mm, y_a, sigma=0.5, nu=1.0, rho=1.0, max_iter=10):
         H_inv.append(np.linalg.inv(Hi + rho * np.eye(m)).tolist())
         KTy_enc.append(ts.ckks_vector(context, K_a[i].T @ y_a[i]))
 
+    #Intialisation
+    #L'article dit que zeta doit être encode avec une bonne estimation de alpha,
+    #nous on prend 0 pour se simplifier la vie
     zeta_enc = ts.ckks_vector(context, [0.0] * m)
     lambd_enc = [ts.ckks_vector(context, [0.0] * m) for _ in range(N)]
     
