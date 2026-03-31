@@ -1,5 +1,6 @@
 import numpy as np
 
+#This is just a cloud based version of ADMM, whihc helps us to derive th crypted version
 def ADMM_Cloud(K_a, K_mm, y_a, A, sigma=0.5, nu=1.0, rho=1.0, max_iter=1000):
     """
     Standard Global Consensus ADMM.
@@ -37,7 +38,7 @@ def ADMM_Cloud(K_a, K_mm, y_a, A, sigma=0.5, nu=1.0, rho=1.0, max_iter=1000):
 
     return alpha_history
 
-import tenseal as ts #alternative à OpenFHE
+import tenseal as ts #alternative à OpenFHE 
 
 def ADMM_HE(K_a, K_mm, y_a, sigma=0.5, nu=1.0, rho=1.0, max_iter=10):
     N, m = len(K_a), K_mm.shape[0]
@@ -90,6 +91,7 @@ def ADMM_HE(K_a, K_mm, y_a, sigma=0.5, nu=1.0, rho=1.0, max_iter=10):
             z_val = np.array(z_enc[i].decrypt())
             #Dans l'article c'est marqué que l'agent à accès au zeta_i le concernant, évidemment c'est complètement con, parce que ça fait juste ADMM classique,
             #le cryptage ne sert à rien, le seul intérêt les itérations autre que lambda se font en crypté...
+            #Par ailleurs cette étape de décryptage et de cryptage permet de diminuer le bruit accumulé, sinon seul une ou deux itérations possiibles
             l_val = np.array(lambd_enc[i].decrypt())
             l_val = l_val + rho * (z_val - zeta_val)
             lambd_enc[i] = ts.ckks_vector(context, l_val.tolist())
