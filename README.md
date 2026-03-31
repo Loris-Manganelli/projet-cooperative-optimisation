@@ -7,5 +7,12 @@ To be done :
 - [x] Plot convergence graph
 - [x] Display the obtained functions
 - [x] Try with different graph W and observe convergence
-- [ ] Increase the number of selected points in the data and observe convergence
+- [x] Increase the number of selected points in the data and observe convergence
+
+# Part 2
+- [x] Implement FedAvg
+
+# Part 3
+- [x] Implement DGD-DP
+
 
